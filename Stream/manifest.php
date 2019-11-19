@@ -45,11 +45,12 @@ $moduleTables[] = "CREATE TABLE `streamCategory` (
   `streamCategoryID` int(3) unsigned zerofill NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL DEFAULT '',
   `active` enum('Y','N') NOT NULL DEFAULT 'Y',
-  `staffAccess` enum('Y','N') NOT NULL DEFAULT 'N',
-  `studentAccess` enum('Y','N') NOT NULL DEFAULT 'N',
-  `parentAccess` enum('Y','N') NOT NULL DEFAULT 'N',
-  `otherAccess` enum('Y','N') NOT NULL DEFAULT 'N',
-  PRIMARY KEY (`streamCategoryID`)
+  `staffAccess` enum('None','Can View', 'Can Post') NOT NULL DEFAULT 'None',
+  `studentAccess` enum('None','Can View', 'Can Post') NOT NULL DEFAULT 'None',
+  `parentAccess` enum('None','Can View', 'Can Post') NOT NULL DEFAULT 'None',
+  `otherAccess` enum('None','Can View', 'Can Post') NOT NULL DEFAULT 'None',
+  PRIMARY KEY (`streamCategoryID`),
+  UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
 //Settings
@@ -141,8 +142,8 @@ $actionRows[] = [
     'precedence'                => '0',
     'category'                  => 'Manage',
     'description'               => 'Allows a user to manage settings for the Stream Module.',
-    'URLList'                   => 'stream_setting.php',
-    'entryURL'                  => 'stream_setting.php',
+    'URLList'                   => 'settings.php',
+    'entryURL'                  => 'settings.php',
     'entrySidebar'              => 'Y',
     'menuShow'                  => 'Y',
     'defaultPermissionAdmin'    => 'Y',

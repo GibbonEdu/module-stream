@@ -5,3 +5,5 @@ v0.1.00
 -------
 Action definitions
 Data structure definitions
+Stream Settings
+Manage categories

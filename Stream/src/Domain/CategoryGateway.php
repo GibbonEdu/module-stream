@@ -30,7 +30,7 @@ class CategoryGateway extends QueryableGateway
     private static $tableName = 'streamCategory';
     private static $primaryKey = 'streamCategoryID';
     private static $searchableColumns = [''];
-    
+
     /**
      * @param QueryCriteria $criteria
      * @return DataSet
@@ -52,5 +52,21 @@ class CategoryGateway extends QueryableGateway
         ]);
 
         return $this->runQuery($query, $criteria);
+    }
+
+    /**
+     * @param $pdo
+     * @param $name
+     * @return bool
+     */
+    public function unique($pdo, $name, $streamCategoryID = null)
+    {
+        $data = array('name' => $name);
+        $sql = "SELECT streamCategoryID FROM streamCategory WHERE name=:name";
+        if (!is_null($streamCategoryID)) {
+            $data['streamCategoryID'] = $streamCategoryID;
+            $sql .= " AND NOT streamCategoryID=:streamCategoryID";
+        }
+        return ($pdo->select($sql, $data)->rowCount() == 0 ) ? true : false ;
     }
 }
