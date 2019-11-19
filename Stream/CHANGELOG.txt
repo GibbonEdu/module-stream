@@ -1,0 +1,7 @@
+CHANGELOG
+=========
+
+v0.1.00
+-------
+Action definitions
+Data structure definitions
