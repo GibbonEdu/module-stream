@@ -1,0 +1,42 @@
+{#<!--
+Gibbon, Flexible & Open School System
+Copyright (C) 2010, Ross Parker
+
+This is a Gibbon template file, written in HTML and Twig syntax.
+For info about editing, see: https://twig.symfony.com/doc/2.x/
+-->#}
+
+
+{% if stream %}
+    <div class="rounded border overflow-hidden">
+    {% for post in stream %}
+        <div class="flex bg-white p-4 sm:px-4 sm:py-5 font-sans {{ not loop.last ? 'border-b' }}">
+
+            <aside class="w-10 sm:w-12 mr-3 ">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-200 overflow-hidden">
+                    <img class="w-full" src="{{ absoluteURL }}/{{ post.image_240 }}" />
+                </div>
+            </aside>
+
+            <section class="">
+                <header class="-mt-px mb-2 text-sm leading-none">
+                    <span class="font-semibold">{{ formatUsing('name', post.title, post.preferredName, post.surname, 'Staff', false, true) }}</span>
+                     · 
+                    <span class="text-gray-600">{{ formatUsing('relativeTime', post.timestamp) }}</span>
+                </header>
+
+                <div class="text-gray-700 leading-tight text-sm sm:text-base mr-3">
+                    {{ post.post|raw }}
+                </div>
+
+                <footer></footer>
+            </section>
+            
+        </div>
+    {% endfor %}
+    </div>
+{% else %}
+<div class="h-48 rounded border bg-gray-100 shadow-inner overflow-hidden flex items-center justify-center">
+    <span class="text-gray-600 text-lg">{{ __('There are no records to display.') }}</span>
+</div>
+{% endif%}

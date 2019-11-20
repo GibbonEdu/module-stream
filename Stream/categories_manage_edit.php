@@ -29,8 +29,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/categories_manage_e
     $streamCategoryID = $_GET['streamCategoryID'] ?? '';
 
     $page->breadcrumbs
-        ->add(__m('Manage Blocks'), 'categories_manage.php')
-        ->add(__m('Edit Block'));
+        ->add(__m('Manage Categories'), 'categories_manage.php')
+        ->add(__m('Edit Category'));
 
     if (isset($_GET['return'])) {
         returnProcess($guid, $_GET['return'], null, null);

@@ -35,16 +35,24 @@ class PostGateway extends QueryableGateway
      * @param QueryCriteria $criteria
      * @return DataSet
      */
-    public function queryStreamBySchoolYear(QueryCriteria $criteria, $gibbonSchoolYearID)
+    public function queryPostsBySchoolYear(QueryCriteria $criteria, $gibbonSchoolYearID)
     {
         $query = $this
             ->newQuery()
             ->distinct()
             ->from($this->getTableName())
-            ->cols(['streamPost.streamPostID', 'streamPost.post', 'streamPost.tag', 'streamPost.timestamp', 'gibbonPerson.title', 'gibbonPerson.preferredName', 'gibbonPerson.surname'])
-            ->innerJoin('gibbonPerson', 'gibbonPersonID.gibbonPersonID=streamPost.gibbonPersonID')
+            ->cols(['streamPost.streamPostID', 'streamPost.post', 'streamPost.tag', 'streamPost.timestamp', 'gibbonPerson.title', 'gibbonPerson.preferredName', 'gibbonPerson.surname', 'gibbonPerson.image_240'])
+            ->innerJoin('gibbonPerson', 'gibbonPerson.gibbonPersonID=streamPost.gibbonPersonID')
             ->where('streamPost.gibbonSchoolYearID=:gibbonSchoolYearID')
             ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID);
+
+        $criteria->addFilterRules([
+            'tag' => function ($query, $tag) {
+                return $query
+                    ->where('FIND_IN_SET(:tag, streamPost.tag)')
+                    ->bindValue('tag', $tag);
+            },
+        ]);
 
         return $this->runQuery($query, $criteria);
     }
