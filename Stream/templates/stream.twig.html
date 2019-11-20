@@ -13,14 +13,14 @@ For info about editing, see: https://twig.symfony.com/doc/2.x/
         <div class="flex bg-white p-4 sm:px-4 sm:py-5 font-sans {{ not loop.last ? 'border-b' }}">
 
             <aside class="w-10 sm:w-12 mr-3 ">
-                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-200 overflow-hidden">
-                    <img class="w-full" src="{{ absoluteURL }}/{{ post.image_240 }}" />
-                </div>
+                <a class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-200 overflow-hidden flex items-center justidfy-center" href="{{ absoluteURL }}/index.php?q=/modules/Stream/stream.php&user={{ post.username }}">
+                    <img class="w-full" src="{{ absoluteURL }}/{{ post.image_240 }}" onerror="this.src='{{ absoluteURL }}/themes/{{ gibbonThemeName }}/img/anonymous_125.jpg'" />
+                </a>
             </aside>
 
             <section class="">
                 <header class="-mt-px mb-2 text-sm leading-none">
-                    <span class="font-semibold">{{ formatUsing('name', post.title, post.preferredName, post.surname, 'Staff', false, true) }}</span>
+                    <a class="font-semibold no-underline text-gray-800" href="{{ absoluteURL }}/index.php?q=/modules/Stream/stream.php&user={{ post.username }}">{{ formatUsing('name', post.title, post.preferredName, post.surname, 'Staff', false, true) }}</a>
                      · 
                     <span class="text-gray-600">{{ formatUsing('relativeTime', post.timestamp) }}</span>
                 </header>
@@ -34,7 +34,8 @@ For info about editing, see: https://twig.symfony.com/doc/2.x/
                     {% for attachment in post.attachments %}
                         <figure class="{{ loop.length % 3 == 0 ? 'w-1/3 h-24 sm:h-48' : loop.length % 2 == 1 and loop.index == 1 ? 'w-full h-32 sm:h-64' : 'w-1/2 h-24 sm:h-48' }} p-1" style="line-height: 0;">
                         {% if attachment.type == 'image' %}
-                            <a class="block w-full h-full rounded-sm overflow-hidden bg-no-repeat bg-cover bg-center" href="{{ absoluteURL }}/{{ attachment.src }}" style="background-image:url('{{ absoluteURL }}/{{ attachment.src }}')"></a>
+                            <a class="block w-full h-full rounded-sm overflow-hidden bg-no-repeat bg-cover bg-center" href="{{ absoluteURL }}/{{ attachment.src }}" style="background-image:url('{{ absoluteURL }}/{{ attachment.thumb }}')">
+                            </a>
                         {% endif %}
                         </figure>
                     {% endfor %}

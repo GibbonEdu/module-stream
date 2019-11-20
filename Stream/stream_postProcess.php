@@ -55,17 +55,22 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
         $data['tags'] = implode(',', $matches[1] ?? []);
     }
 
-    // Handle file upload for multiple attachments
+    // Handle file upload for multiple attachments, including resizing images & generating thumbnails
     if (!empty($_FILES['attachments']['tmp_name'][0])) {
         $fileUploader = new FileUploader($pdo, $gibbon->session);
-        $fileUploader->setFileSuffixType(FileUploader::FILE_SUFFIX_INCREMENTAL);
+        $absolutePath = $gibbon->session->get('absolutePath');
 
         foreach ($_FILES['attachments']['name'] as $index => $name) {
             $file = array_combine(array_keys($_FILES['attachments']), array_column($_FILES['attachments'], $index));
-            $attachment = $fileUploader->uploadFromPost($file);
+            $attachment = $fileUploader->uploadAndResizeImage($file, 'streamPhoto', 1400, 1400);
+            
+            $thumbPath = $absolutePath.'/'.str_replace('streamPhoto', 'streamThumb', $attachment);
+            $thumb = $fileUploader->resizeImage($absolutePath.'/'.$attachment, $thumbPath, 650);
+
             $attachments[] = [
-                'type' => 'image',
-                'src' => $attachment,
+                'type'  => 'image',
+                'src'   => $attachment,
+                'thumb' => str_replace($absolutePath.'/', '', $thumb),
             ];
         }
         if (!empty($attachments)) {
