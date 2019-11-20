@@ -35,7 +35,8 @@ $moduleTables[] = "CREATE TABLE `streamPost` (
   `gibbonSchoolYearID` int(3) unsigned zerofill NOT NULL,
   `gibbonPersonID` int(10) unsigned zerofill NOT NULL,
   `post` text,
-  `tag` text,
+  `tags` text,
+  `attachments` text,
   `streamCategoryIDList` varchar(255) DEFAULT NULL,
   `timestamp` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`streamPostID`)

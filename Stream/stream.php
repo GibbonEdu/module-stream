@@ -19,6 +19,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use Gibbon\Module\Stream\Domain\PostGateway;
 use Gibbon\Services\Format;
+use Gibbon\Forms\Form;
+use Gibbon\Domain\System\SettingGateway;
 
 if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == false) {
     // Access denied
@@ -29,11 +31,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
         'tag' => $_GET['tag'] ?? ''
     ];
 
+
+    $page->scripts->add('magnific', 'modules/Stream/js/magnific/jquery.magnific-popup.min.js');
+    $page->stylesheets->add('magnific', 'modules/Stream/js/magnific/magnific-popup.css');
+
     $page->breadcrumbs
         ->add(__m('View Stream'), 'stream.php');
 
     if (!empty($urlParams['tag'])) {
-        $page->breadcrumbs->add(__('Viewing {filter}', ['filter' => '#'.$urlParams['tag']]));
+        $page->breadcrumbs->add(__('Viewing {filter}', ['filter' => '#' . $urlParams['tag']]));
     }
 
     if (isset($_GET['return'])) {
@@ -44,17 +50,20 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
     $postGateway = $container->get(PostGateway::class);
     $gibbonSchoolYearID = $gibbon->session->get('gibbonSchoolYearID');
 
-    $criteria = $postGateway->newQueryCriteria()
+    $criteria = $postGateway->newQueryCriteria(true)
         ->sortBy(['timestamp'], 'DESC')
         ->filterBy('tag', $urlParams['tag'])
         ->fromPOST();
 
     $stream = $postGateway->queryPostsBySchoolYear($criteria, $gibbonSchoolYearID);
 
-    // Auto-link hashtags
     $stream = array_map(function ($item) {
+        // Decode attachments into an array
+        $item['attachments'] = json_decode($item['attachments'], true);
+
+        // Auto-link hashtags
         $item['post'] = preg_replace_callback('/([#]+)([\w]+)/iu', function ($matches) {
-            return Format::link('./index.php?q=/modules/Stream/stream.php&tag='.$matches[2], $matches[1] . $matches[2]);
+            return Format::link('./index.php?q=/modules/Stream/stream.php&tag=' . $matches[2], $matches[1] . $matches[2]);
         }, $item['post']);
 
         return $item;
@@ -64,4 +73,34 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
     echo $page->fetchFromTemplate('stream.twig.html', [
         'stream' => $stream,
     ]);
+
+    // FORM
+    $form = Form::create('block', $gibbon->session->get('absoluteURL').'/modules/Stream/stream_postProcess.php');
+    $form->addClass('mt-10');
+    $form->addHiddenValue('address', $gibbon->session->get('address'));
+
+    $postLength = $container->get(SettingGateway::class)->getSettingByScope('Stream', 'postLength');
+    $col = $form->addRow()->addColumn();
+        $col->addLabel('post', __('Post'));
+        $col->addTextArea('post')->required()->setRows(6)->maxLength($postLength);
+
+    $row = $form->addRow()->addDetails()->summary(__('Add Photos'));
+        $row->addFileUpload('attachments')->accepts('.jpg,.jpeg,.gif,.png')->uploadMultiple(true);
+
+    $row = $form->addRow()->addSubmit(__('Post'));
+
+    $_SESSION[$guid]['sidebarExtra'] .= $form->getOutput();
 }
+?>
+
+<script>
+    $(document).ready(function() {
+        $('.image-container').magnificPopup({
+            type: 'image',
+            delegate: 'a',
+            gallery: {
+                enabled: true
+            },
+        });
+    });
+</script>

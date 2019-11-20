@@ -41,7 +41,7 @@ class PostGateway extends QueryableGateway
             ->newQuery()
             ->distinct()
             ->from($this->getTableName())
-            ->cols(['streamPost.streamPostID', 'streamPost.post', 'streamPost.tag', 'streamPost.timestamp', 'gibbonPerson.title', 'gibbonPerson.preferredName', 'gibbonPerson.surname', 'gibbonPerson.image_240'])
+            ->cols(['streamPost.streamPostID', 'streamPost.post', 'streamPost.tags', 'streamPost.attachments', 'streamPost.timestamp', 'gibbonPerson.title', 'gibbonPerson.preferredName', 'gibbonPerson.surname', 'gibbonPerson.image_240'])
             ->innerJoin('gibbonPerson', 'gibbonPerson.gibbonPersonID=streamPost.gibbonPersonID')
             ->where('streamPost.gibbonSchoolYearID=:gibbonSchoolYearID')
             ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID);
@@ -49,7 +49,7 @@ class PostGateway extends QueryableGateway
         $criteria->addFilterRules([
             'tag' => function ($query, $tag) {
                 return $query
-                    ->where('FIND_IN_SET(:tag, streamPost.tag)')
+                    ->where('FIND_IN_SET(:tag, streamPost.tags)')
                     ->bindValue('tag', $tag);
             },
         ]);
