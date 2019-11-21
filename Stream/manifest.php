@@ -35,8 +35,6 @@ $moduleTables[] = "CREATE TABLE `streamPost` (
   `gibbonSchoolYearID` int(3) unsigned zerofill NOT NULL,
   `gibbonPersonID` int(10) unsigned zerofill NOT NULL,
   `post` text,
-  `tags` text,
-  `attachments` text,
   `streamCategoryIDList` varchar(255) DEFAULT NULL,
   `timestamp` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`streamPostID`)
@@ -52,6 +50,23 @@ $moduleTables[] = "CREATE TABLE `streamCategory` (
   `otherAccess` enum('None','Can View', 'Can Post') NOT NULL DEFAULT 'None',
   PRIMARY KEY (`streamCategoryID`),
   UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+
+$moduleTables[] = "CREATE TABLE `streamPostTag` (
+  `streamPostTagID` int(11) unsigned zerofill NOT NULL AUTO_INCREMENT,
+  `streamPostID` int(10) unsigned zerofill DEFAULT NULL,
+  `tag` varchar(100) NOT NULL DEFAULT '',
+  PRIMARY KEY (`streamPostTagID`),
+  KEY `streamPostID` (`streamPostID`),
+  KEY `tag` (`tag`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+
+$moduleTables[] = "CREATE TABLE `streamPostAttachment` (
+  `streamPostAttachmentID` int(11) unsigned zerofill NOT NULL AUTO_INCREMENT,
+  `streamPostID` int(10) unsigned zerofill DEFAULT NULL,
+  `attachment` varchar(100) NOT NULL DEFAULT '',
+  PRIMARY KEY (`streamPostAttachmentID`),
+  KEY `streamPostID` (`streamPostID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
 //Settings
