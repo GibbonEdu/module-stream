@@ -35,7 +35,7 @@ class PostGateway extends QueryableGateway
      * @param QueryCriteria $criteria
      * @return DataSet
      */
-    public function queryPostsBySchoolYear(QueryCriteria $criteria, $gibbonSchoolYearID)
+    public function queryPostsBySchoolYear(QueryCriteria $criteria, $gibbonSchoolYearID, $gibbonPersonID = null)
     {
         $query = $this
             ->newQuery()
@@ -48,6 +48,10 @@ class PostGateway extends QueryableGateway
             ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID)
             ->groupBy(['streamPost.streamPostID']);
 
+        if (!empty($gibbonPersonID)) {
+            $query->where('streamPost.gibbonPersonID=:gibbonPersonID')
+                  ->bindValue('gibbonPersonID', $gibbonPersonID);
+        }
         $criteria->addFilterRules([
             'tag' => function ($query, $tag) {
                 return $query

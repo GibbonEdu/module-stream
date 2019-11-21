@@ -56,11 +56,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/categories_manage_a
     }
 
     // Create the record
-    $clinicsBlocksID = $categoryGateway->insert($data);
+    $streamCategoryID = $categoryGateway->insert($data);
 
-    $URL .= !$clinicsBlocksID
+    $URL .= !$streamCategoryID
         ? "&return=error2"
-        : "&return=success0&editID=$clinicsBlocksID";
+        : "&return=success0&editID=$streamCategoryID";
 
     header("Location: {$URL}");
 }

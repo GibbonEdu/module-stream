@@ -48,7 +48,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/categories_manage_e
         return;
     }
 
-    $form = Form::create('block', $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module').'/categories_manage_editProcess.php');
+    $form = Form::create('category', $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module').'/categories_manage_editProcess.php');
     $form->setFactory(DatabaseFormFactory::create($pdo));
 
     $form->addHiddenValue('address', $gibbon->session->get('address'));

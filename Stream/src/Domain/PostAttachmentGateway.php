@@ -39,7 +39,7 @@ class PostAttachmentGateway extends QueryableGateway
             ->newSelect()
             ->distinct()
             ->from($this->getTableName())
-            ->cols(['streamPostAttachment.streamPostID as groupBy', 'attachment', 'thumbnail', 'type'])
+            ->cols(['streamPostAttachment.streamPostID as groupBy', 'streamPostAttachmentID', 'attachment', 'thumbnail', 'type'])
             ->where('FIND_IN_SET(streamPostAttachment.streamPostID, :postList)')
             ->bindValue('postList', $postList);
 

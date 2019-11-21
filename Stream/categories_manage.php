@@ -33,7 +33,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/categories_manage.p
         returnProcess($guid, $_GET['return'], null, null);
     }
 
-    //Query blocks
+    // Query categories
     $categoryGateway = $container->get(categoryGateway::class);
 
     $criteria = $categoryGateway->newQueryCriteria()
@@ -42,7 +42,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/categories_manage.p
 
     $categories = $categoryGateway->queryCategories($criteria);
 
-    //Render table
+    // Render table
     $table = DataTable::createPaginated('categories', $criteria);
 
     $table->addHeaderAction('add', __('Add'))
@@ -55,7 +55,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/categories_manage.p
     });
 
     $table->addColumn('name', __('Name'))
-        ->sortable(['clinicsBlock.name']);
+        ->sortable(['streamCategory.name']);
 
     $table->addColumn('staffAccess', __m('Staff Access'));
     $table->addColumn('studentAccess', __m('Staff Access'));
@@ -65,7 +65,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/categories_manage.p
     // ACTIONS
     $table->addActionColumn()
         ->addParam('streamCategoryID')
-        ->format(function ($block, $actions) {
+        ->format(function ($category, $actions) {
             $actions->addAction('edit', __('Edit'))
                     ->setURL('/modules/Stream/categories_manage_edit.php');
 

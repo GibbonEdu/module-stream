@@ -27,7 +27,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/categories_manage_a
     // Proceed!
     $page->breadcrumbs
         ->add(__m('Manage Categories'), 'categories_manage.php')
-        ->add(__m('Add Caegory'));
+        ->add(__m('Add Category'));
 
     $editLink = '';
     if (isset($_GET['editID'])) {
@@ -37,7 +37,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/categories_manage_a
         returnProcess($guid, $_GET['return'], $editLink, null);
     }
 
-    $form = Form::create('block', $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module').'/categories_manage_addProcess.php');
+    $form = Form::create('category', $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module').'/categories_manage_addProcess.php');
     $form->setFactory(DatabaseFormFactory::create($pdo));
 
     $form->addHiddenValue('address', $gibbon->session->get('address'));

@@ -28,9 +28,12 @@ $_POST['address'] = '/modules/Stream/stream_postProcess.php';
 
 require_once '../../gibbon.php';
 
-$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Stream/stream.php';
+$source = $_POST['source'] ?? '';
+$URL = $source == 'stream'
+    ? $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Stream/stream.php'
+    : $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Stream/posts_manage_add.php';
 
-if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == false) {
+if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.php') == false) {
     $URL .= '&return=error0';
     header("Location: {$URL}");
     exit;
@@ -39,6 +42,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
     $postGateway = $container->get(PostGateway::class);
     $postTagGateway = $container->get(PostTagGateway::class);
     $postAttachmentGateway = $container->get(PostAttachmentGateway::class);
+    
     $partialFail = false;
 
     $data = [

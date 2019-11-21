@@ -82,20 +82,20 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
     ]);
 
     // NEW POST
-    $form = Form::create('block', $gibbon->session->get('absoluteURL').'/modules/Stream/stream_postProcess.php');
-    $form->addClass('lg:mt-10');
+    $form = Form::create('block', $gibbon->session->get('absoluteURL').'/modules/Stream/posts_manage_addProcess.php');
     $form->addHiddenValue('address', $gibbon->session->get('address'));
+    $form->addHiddenValue('source', 'stream');
 
     $postLength = $container->get(SettingGateway::class)->getSettingByScope('Stream', 'postLength');
     $col = $form->addRow()->addColumn();
-        $col->addLabel('post', __('Post'));
-        $col->addTextArea('post')->required()->setRows(6)->maxLength($postLength);
+        $col->addTextArea('post')->required()->setRows(6)->addClass('font-sans text-sm')->maxLength($postLength);
 
     $row = $form->addRow()->addDetails()->summary(__('Add Photos'));
         $row->addFileUpload('attachments')->accepts('.jpg,.jpeg,.gif,.png')->uploadMultiple(true);
 
     $row = $form->addRow()->addSubmit(__('Post'));
 
+    $_SESSION[$guid]['sidebarExtra'] .= '<h5 class="mt-4 mb-2 text-xs pb-0 ">'.__('New Post').'</h5>';
     $_SESSION[$guid]['sidebarExtra'] .= $form->getOutput();
 
     // RECENT TAGS
@@ -113,6 +113,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
             gallery: {
                 enabled: true
             },
+            image: {
+                titleSrc: 'data-caption',
+            }
         });
     });
 </script>
