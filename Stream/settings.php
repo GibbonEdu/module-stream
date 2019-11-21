@@ -44,6 +44,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/settings.php') == f
         $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
         $row->addNumber($setting['name'])->required()->setValue($setting['value'])->minimum(100)->maximum(1000);
 
+    $setting = $settingGateway->getSettingByScope('Stream', 'maxImageSize', true);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addNumber($setting['name'])->required()->setValue($setting['value'])->minimum(1024)->maximum(4096);
+
     $row = $form->addRow();
         $row->addFooter();
         $row->addSubmit();

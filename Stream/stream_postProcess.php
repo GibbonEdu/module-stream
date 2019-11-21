@@ -17,9 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-use Gibbon\Services\Format;
-use Gibbon\Module\Stream\Domain\PostGateway;
 use Gibbon\FileUploader;
+use Gibbon\Services\Format;
+use Gibbon\Domain\System\SettingGateway;
+use Gibbon\Module\Stream\Domain\PostGateway;
+use Gibbon\Module\Stream\Domain\PostTagGateway;
+use Gibbon\Module\Stream\Domain\PostAttachmentGateway;
 
 $_POST['address'] = '/modules/Stream/stream_postProcess.php';
 
@@ -34,6 +37,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
 } else {
     // Proceed!
     $postGateway = $container->get(PostGateway::class);
+    $postTagGateway = $container->get(PostTagGateway::class);
+    $postAttachmentGateway = $container->get(PostAttachmentGateway::class);
+    $partialFail = false;
 
     $data = [
         'gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'),
@@ -49,40 +55,52 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
         exit;
     }
 
+    // Create the post
+    $streamPostID = $postGateway->insert($data);
+
     // Auto-detect tags used in this post
     $matches = [];
     if (preg_match_all('/[#]+([\w]+)/iu', $data['post'], $matches)) {
-        $data['tags'] = implode(',', $matches[1] ?? []);
+        foreach ($matches[1] as $tag) {
+            $data = [
+                'streamPostID' => $streamPostID,
+                'tag' => $tag,
+            ];
+
+            $postTagGateway->insertAndUpdate($data, $data);
+        }
     }
 
     // Handle file upload for multiple attachments, including resizing images & generating thumbnails
     if (!empty($_FILES['attachments']['tmp_name'][0])) {
         $fileUploader = new FileUploader($pdo, $gibbon->session);
         $absolutePath = $gibbon->session->get('absolutePath');
+        $maxImageSize = $container->get(SettingGateway::class)->getSettingByScope('Stream', 'maxImageSize');
 
         foreach ($_FILES['attachments']['name'] as $index => $name) {
             $file = array_combine(array_keys($_FILES['attachments']), array_column($_FILES['attachments'], $index));
-            $attachment = $fileUploader->uploadAndResizeImage($file, 'streamPhoto', 1400, 1400);
+            $attachment = $fileUploader->uploadAndResizeImage($file, 'streamPhoto', $maxImageSize, 90);
             
-            $thumbPath = $absolutePath.'/'.str_replace('streamPhoto', 'streamThumb', $attachment);
-            $thumb = $fileUploader->resizeImage($absolutePath.'/'.$attachment, $thumbPath, 650);
+            if (!empty($attachment)) {
+                $thumbPath = $absolutePath.'/'.str_replace('streamPhoto', 'streamThumb', $attachment);
+                $thumbnail = $fileUploader->resizeImage($absolutePath.'/'.$attachment, $thumbPath, 650);
 
-            $attachments[] = [
-                'type'  => 'image',
-                'src'   => $attachment,
-                'thumb' => str_replace($absolutePath.'/', '', $thumb),
-            ];
-        }
-        if (!empty($attachments)) {
-            $data['attachments'] = json_encode($attachments);
+                $data = [
+                    'streamPostID' => $streamPostID,
+                    'attachment'   => $attachment,
+                    'thumbnail'    => str_replace($absolutePath.'/', '', $thumbnail),
+                    'type'         => 'Image',
+                ];
+
+                $postAttachmentGateway->insert($data);
+            } else {
+                $partialFail = true;
+            }
         }
     }
 
-    // Create the post
-    $streamPostID = $postGateway->insert($data);
-
-    $URL .= !$streamPostID
-        ? "&return=error2"
+    $URL .= $partialFail
+        ? "&return=warning1"
         : "&return=success0&editID=$streamPostID";
 
     header("Location: {$URL}");

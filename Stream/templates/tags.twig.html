@@ -1,0 +1,18 @@
+{#<!--
+Gibbon, Flexible & Open School System
+Copyright (C) 2010, Ross Parker
+
+This is a Gibbon template file, written in HTML and Twig syntax.
+For info about editing, see: https://twig.symfony.com/doc/2.x/
+-->#}
+
+
+{% if tags %}
+    <h5 class="mt-6 mb-2 text-xs pb-0 ">{{ __('Recent Tags') }}</h5>
+
+    <div class="">
+    {% for tag in tags %}
+        <a class="mr-1 text-blue-700 hover:text-blue-500 hover:underline" href="{{ absoluteURL }}/index.php?q=/modules/Stream/stream.php&tag={{ tag }}">{{ tag|title }}</a>
+    {% endfor %}
+    </div>
+{% endif%}

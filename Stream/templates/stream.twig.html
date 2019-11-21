@@ -33,8 +33,8 @@ For info about editing, see: https://twig.symfony.com/doc/2.x/
                     <div class="image-container flex flex-wrap justify-start  mt-2 -m-1">
                     {% for attachment in post.attachments %}
                         <figure class="{{ loop.length % 3 == 0 ? 'w-1/3 h-24 sm:h-48' : loop.length % 2 == 1 and loop.index == 1 ? 'w-full h-32 sm:h-64' : 'w-1/2 h-24 sm:h-48' }} p-1" style="line-height: 0;">
-                        {% if attachment.type == 'image' %}
-                            <a class="block w-full h-full rounded-sm overflow-hidden bg-no-repeat bg-cover bg-center" href="{{ absoluteURL }}/{{ attachment.src }}" style="background-image:url('{{ absoluteURL }}/{{ attachment.thumb }}')">
+                        {% if attachment.type == 'Image' %}
+                            <a class="block w-full h-full rounded-sm overflow-hidden bg-no-repeat bg-cover bg-center" href="{{ absoluteURL }}/{{ attachment.attachment }}" style="background-image:url('{{ absoluteURL }}/{{ attachment.thumbnail }}')">
                             </a>
                         {% endif %}
                         </figure>

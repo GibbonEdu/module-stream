@@ -17,10 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Forms\Form;
+use Gibbon\Services\Format;
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\Stream\Domain\PostGateway;
-use Gibbon\Services\Format;
-use Gibbon\Forms\Form;
+use Gibbon\Module\Stream\Domain\PostTagGateway;
+use Gibbon\Module\Stream\Domain\PostAttachmentGateway;
 
 if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == false) {
     // Access denied
@@ -59,11 +61,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
         ->fromPOST();
 
     $stream = $postGateway->queryPostsBySchoolYear($criteria, $gibbonSchoolYearID);
-    $stream = array_map(function ($item) {
-        // Decode attachments into an array
-        $item['attachments'] = json_decode($item['attachments'], true);
 
-        // Auto-link hashtags
+    // Join a set of attachment data per post
+    $streamPosts = $stream->getColumn('streamPostID');
+    $attachments = $container->get(PostAttachmentGateway::class)->selectAttachmentsByPost($streamPosts)->fetchGrouped();
+    $stream->joinColumn('streamPostID', 'attachments', $attachments);
+
+    // Auto-link hashtags
+    $stream = array_map(function ($item) {
         $item['post'] = preg_replace_callback('/([#]+)([\w]+)/iu', function ($matches) {
             return Format::link('./index.php?q=/modules/Stream/stream.php&tag=' . $matches[2], $matches[1] . $matches[2]);
         }, $item['post']);
@@ -71,12 +76,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
         return $item;
     }, $stream->toArray());
 
-    // RENDER
+    // RENDER STREAM
     echo $page->fetchFromTemplate('stream.twig.html', [
         'stream' => $stream,
     ]);
 
-    // FORM
+    // NEW POST
     $form = Form::create('block', $gibbon->session->get('absoluteURL').'/modules/Stream/stream_postProcess.php');
     $form->addClass('lg:mt-10');
     $form->addHiddenValue('address', $gibbon->session->get('address'));
@@ -92,6 +97,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
     $row = $form->addRow()->addSubmit(__('Post'));
 
     $_SESSION[$guid]['sidebarExtra'] .= $form->getOutput();
+
+    // RECENT TAGS
+    $tags = $container->get(PostTagGateway::class)->selectRecentTagsBySchoolYear($gibbonSchoolYearID)->fetchAll(\PDO::FETCH_COLUMN, 0);
+    $_SESSION[$guid]['sidebarExtra'] .= $page->fetchFromTemplate('tags.twig.html', [
+        'tags' => $tags,
+    ]);
 }
 ?>
 <script>

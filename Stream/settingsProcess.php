@@ -33,7 +33,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/settings.php') == f
 
     $settingsToUpdate = [
         'Stream' => [
-            'postLength'
+            'postLength', 'maxImageSize'
         ],
     ];
 

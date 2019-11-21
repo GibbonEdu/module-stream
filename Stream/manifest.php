@@ -31,46 +31,48 @@ $url = 'https://gibbonedu.org';
 
 //Module tables
 $moduleTables[] = "CREATE TABLE `streamPost` (
-  `streamPostID` int(10) unsigned zerofill NOT NULL AUTO_INCREMENT,
-  `gibbonSchoolYearID` int(3) unsigned zerofill NOT NULL,
-  `gibbonPersonID` int(10) unsigned zerofill NOT NULL,
-  `post` text,
-  `streamCategoryIDList` varchar(255) DEFAULT NULL,
-  `timestamp` timestamp NULL DEFAULT NULL,
+  `streamPostID` INT(10) unsigned zerofill NOT NULL AUTO_INCREMENT,
+  `gibbonSchoolYearID` INT(3) unsigned zerofill NOT NULL,
+  `gibbonPersonID` INT(10) unsigned zerofill NOT NULL,
+  `post` TEXT,
+  `streamCategoryIDList` VARCHAR(255) DEFAULT NULL,
+  `timestamp` TIMESTAMP NULL DEFAULT NULL,
   PRIMARY KEY (`streamPostID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
 $moduleTables[] = "CREATE TABLE `streamCategory` (
-  `streamCategoryID` int(3) unsigned zerofill NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL DEFAULT '',
-  `active` enum('Y','N') NOT NULL DEFAULT 'Y',
-  `staffAccess` enum('None','Can View', 'Can Post') NOT NULL DEFAULT 'None',
-  `studentAccess` enum('None','Can View', 'Can Post') NOT NULL DEFAULT 'None',
-  `parentAccess` enum('None','Can View', 'Can Post') NOT NULL DEFAULT 'None',
-  `otherAccess` enum('None','Can View', 'Can Post') NOT NULL DEFAULT 'None',
+  `streamCategoryID` INT(3) unsigned zerofill NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL DEFAULT '',
+  `active` ENUM('Y','N') NOT NULL DEFAULT 'Y',
+  `staffAccess` ENUM('None','Can View', 'Can Post') NOT NULL DEFAULT 'None',
+  `studentAccess` ENUM('None','Can View', 'Can Post') NOT NULL DEFAULT 'None',
+  `parentAccess` ENUM('None','Can View', 'Can Post') NOT NULL DEFAULT 'None',
+  `otherAccess` ENUM('None','Can View', 'Can Post') NOT NULL DEFAULT 'None',
   PRIMARY KEY (`streamCategoryID`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
 $moduleTables[] = "CREATE TABLE `streamPostTag` (
-  `streamPostTagID` int(11) unsigned zerofill NOT NULL AUTO_INCREMENT,
-  `streamPostID` int(10) unsigned zerofill DEFAULT NULL,
-  `tag` varchar(100) NOT NULL DEFAULT '',
+  `streamPostTagID` INT(11) unsigned zerofill NOT NULL AUTO_INCREMENT,
+  `streamPostID` INT(10) unsigned zerofill DEFAULT NULL,
+  `tag` VARCHAR(100) NOT NULL DEFAULT '',
   PRIMARY KEY (`streamPostTagID`),
-  KEY `streamPostID` (`streamPostID`),
-  KEY `tag` (`tag`)
+  UNIQUE KEY `streamPostID` (`streamPostID`, `tag`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
 $moduleTables[] = "CREATE TABLE `streamPostAttachment` (
-  `streamPostAttachmentID` int(11) unsigned zerofill NOT NULL AUTO_INCREMENT,
-  `streamPostID` int(10) unsigned zerofill DEFAULT NULL,
-  `attachment` varchar(100) NOT NULL DEFAULT '',
+  `streamPostAttachmentID` INT(11) unsigned zerofill NOT NULL AUTO_INCREMENT,
+  `streamPostID` INT(10) unsigned zerofill DEFAULT NULL,
+  `attachment` VARCHAR(255) NOT NULL DEFAULT '',
+  `thumbnail` VARCHAR(255) NULL,
+  `type` ENUM('Image', 'Video') NOT NULL DEFAULT 'Image',
   PRIMARY KEY (`streamPostAttachmentID`),
   KEY `streamPostID` (`streamPostID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
 //Settings
 $gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Stream', 'postLength', 'Post Length', 'Maximum number of characters in a post.', '280');";
+$gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Stream', 'maxImageSize', 'Max Image Size', 'Maximum image size in pixels. Larger images will be scaled down.', '1400');";
 
 //Action rows
 $actionRows[] = [
