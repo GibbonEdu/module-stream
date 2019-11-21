@@ -13,12 +13,12 @@ For info about editing, see: https://twig.symfony.com/doc/2.x/
         <div class="flex bg-white p-4 sm:px-4 sm:py-5 font-sans {{ not loop.last ? 'border-b' }}">
 
             <aside class="w-10 sm:w-12 mr-3 ">
-                <a class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-200 overflow-hidden flex items-center justidfy-center" href="{{ absoluteURL }}/index.php?q=/modules/Stream/stream.php&user={{ post.username }}">
+                <a class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-200 overflow-hidden flex items-start justify-center" href="{{ absoluteURL }}/index.php?q=/modules/Stream/stream.php&user={{ post.username }}">
                     <img class="w-full" src="{{ absoluteURL }}/{{ post.image_240 }}" onerror="this.src='{{ absoluteURL }}/themes/{{ gibbonThemeName }}/img/anonymous_125.jpg'" />
                 </a>
             </aside>
 
-            <section class="">
+            <section class="w-full">
                 <header class="-mt-px mb-2 text-sm leading-none">
                     <a class="font-semibold no-underline text-gray-800" href="{{ absoluteURL }}/index.php?q=/modules/Stream/stream.php&user={{ post.username }}">{{ formatUsing('name', post.title, post.preferredName, post.surname, 'Staff', false, true) }}</a>
                      · 
