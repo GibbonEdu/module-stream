@@ -67,7 +67,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
         ->filterBy('user', $urlParams['user'])
         ->fromPOST();
 
-    $categories = $categoryGateway->selectViewableCategoriesByRole($gibbon->session->get('gibbonRoleIDCurrent'), '2019-11-21 08:00:00')->fetchGroupedUnique();
+    $date = DateTime::createFromFormat('Y-m-d H:i:s', 'Yesterday');
+    $categories = $categoryGateway->selectViewableCategoriesByRole($gibbon->session->get('gibbonRoleIDCurrent'), $date)->fetchGroupedUnique();
     if (!empty($categories)) {
         $categories = array_merge([0 => ['name' => __('All'), 'streamCategoryID' => 0]], $categories);
     }
@@ -109,6 +110,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
         $form = Form::create('block', $gibbon->session->get('absoluteURL').'/modules/Stream/posts_manage_addProcess.php');
         $form->addHiddenValue('address', $gibbon->session->get('address'));
         $form->addHiddenValue('source', 'stream');
+        $form->addHiddenValue('streamCategoryID', $urlParams['streamCategoryID']);
 
         $postLength = $container->get(SettingGateway::class)->getSettingByScope('Stream', 'postLength');
         $col = $form->addRow()->addColumn();

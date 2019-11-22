@@ -30,8 +30,10 @@ $_POST['address'] = '/modules/Stream/stream_postProcess.php';
 require_once '../../gibbon.php';
 
 $source = $_POST['source'] ?? '';
+$category = $_POST['category'] ?? '';
+$streamCategoryID = $_POST['streamCategoryID'] ?? '';
 $URL = $source == 'stream'
-    ? $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Stream/stream.php'
+    ? $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Stream/stream.php&category='.$category.'&streamCategoryID='.$streamCategoryID
     : $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Stream/posts_manage_add.php';
 
 if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.php') == false) {
@@ -51,7 +53,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.ph
         'gibbonSchoolYearID'    => $gibbon->session->get('gibbonSchoolYearID'),
         'gibbonPersonID'        => $gibbon->session->get('gibbonPersonID'),
         'post'                  => $_POST['post'] ?? '',
-        'streamCategoryIDList'  => (!empty($_POST['streamCategoryIDList']) &&(is_array($_POST['streamCategoryIDList'])) ? implode(",", $_POST['streamCategoryIDList']) : null),
+        'streamCategoryIDList'  => (!empty($_POST['streamCategoryIDList']) &&(is_array($_POST['streamCategoryIDList'])) ? implode(",", $_POST['streamCategoryIDList']) : $_POST['streamCategoryIDList']),
         'timestamp'             => date('Y-m-d H:i:s'),
     ];
 
