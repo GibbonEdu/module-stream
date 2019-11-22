@@ -54,19 +54,43 @@ class CategoryGateway extends QueryableGateway
         return $this->runQuery($query, $criteria);
     }
 
-    /**
-     * @param $pdo
-     * @param $name
-     * @return bool
-     */
-    public function unique($pdo, $name, $streamCategoryID = null)
+    public function selectViewableCategoriesByRole($gibbonRoleID, $timestamp)
     {
-        $data = array('name' => $name);
-        $sql = "SELECT streamCategoryID FROM streamCategory WHERE name=:name";
-        if (!is_null($streamCategoryID)) {
-            $data['streamCategoryID'] = $streamCategoryID;
-            $sql .= " AND NOT streamCategoryID=:streamCategoryID";
-        }
-        return ($pdo->select($sql, $data)->rowCount() == 0 ) ? true : false ;
+        $query = $this
+            ->newSelect()
+            ->from('gibbonRole')
+            ->cols(['streamCategory.streamCategoryID as groupBy', 'streamCategory.streamCategoryID', 'streamCategory.name', 'streamCategory.active', 'staffAccess', 'studentAccess', 'parentAccess', 'otherAccess', "COUNT(DISTINCT CASE WHEN streamPost.timestamp>:timestamp THEN streamPost.streamPostID END) as recentPosts"])
+            ->innerJoin('streamCategory', "streamCategory.active='Y'")
+            ->leftJoin('streamPost', 'FIND_IN_SET(streamCategory.streamCategoryID, streamPost.streamCategoryIDList)')
+            ->where('gibbonRole.gibbonRoleID=:gibbonRoleID')
+            ->bindValue('gibbonRoleID', $gibbonRoleID)
+            ->bindValue('timestamp', $timestamp)
+            ->where("((gibbonRole.category = 'Staff' AND (streamCategory.staffAccess='View' OR streamCategory.staffAccess='Post')) 
+                OR (gibbonRole.category = 'Student' AND (streamCategory.studentAccess='View' OR streamCategory.studentAccess='Post'))
+                OR (gibbonRole.category = 'Parent' AND (streamCategory.parentAccess='View' OR streamCategory.parentAccess='Post'))
+                OR (gibbonRole.category = 'Other' AND (streamCategory.otherAccess='View' OR streamCategory.otherAccess='Post'))
+            )")
+            ->groupBy(['streamCategory.streamCategoryID']);
+
+        return $this->runSelect($query);
+    }
+
+    public function selectPostableCategoriesByRole($gibbonRoleID)
+    {
+        $query = $this
+            ->newSelect()
+            ->from('gibbonRole')
+            ->cols(['streamCategory.streamCategoryID', 'streamCategory.name'])
+            ->innerJoin('streamCategory', "streamCategory.active='Y'")
+            ->where('gibbonRole.gibbonRoleID=:gibbonRoleID')
+            ->bindValue('gibbonRoleID', $gibbonRoleID)
+            ->where("((gibbonRole.category = 'Staff' AND streamCategory.staffAccess='Post') 
+                OR (gibbonRole.category = 'Student' AND streamCategory.studentAccess='Post')
+                OR (gibbonRole.category = 'Parent' AND streamCategory.parentAccess='Post')
+                OR (gibbonRole.category = 'Other' AND streamCategory.otherAccess='Post')
+            )")
+            ->groupBy(['streamCategory.streamCategoryID']);
+
+        return $this->runSelect($query);
     }
 }

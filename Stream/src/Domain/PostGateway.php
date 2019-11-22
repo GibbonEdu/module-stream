@@ -53,6 +53,11 @@ class PostGateway extends QueryableGateway
                   ->bindValue('gibbonPersonID', $gibbonPersonID);
         }
         $criteria->addFilterRules([
+            'category' => function ($query, $category) {
+                return $query
+                    ->where('FIND_IN_SET(:category, streamPost.streamCategoryIDList)')
+                    ->bindValue('category', $category);
+            },
             'tag' => function ($query, $tag) {
                 return $query
                     ->where('streamPostTag.tag=:tag')

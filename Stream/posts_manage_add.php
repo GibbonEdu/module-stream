@@ -54,20 +54,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.ph
         $row->addFileUpload('attachments')->accepts('.jpg,.jpeg,.gif,.png')->uploadMultiple(true);
 
     //Categories
-    $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
     $categoryGateway = $container->get(CategoryGateway::class);
-    $criteria = $categoryGateway->newQueryCriteria(true);
-    $categories = $categoryGateway->queryCategories($criteria);
-    $categoriesArray = array();
-    foreach ($categories AS $category) {
-        if ($category[strtolower($roleCategory).'Access'] == 'Post') {
-            $categoriesArray[$category['streamCategoryID']] = $category['name'];
-        }
-    }
-    if (count($categoriesArray) > 0 ) {
+    $categories = $categoryGateway->selectPostableCategoriesByRole($gibbon->session->get('gibbonRoleIDCurrent'))->fetchKeyPair();
+
+    if (!empty($categories)) {
         $row = $form->addRow();
             $row->addLabel('streamCategoryIDList', __('Categories'));
-            $row->addCheckbox('streamCategoryIDList')->fromArray($categoriesArray);
+            $row->addCheckbox('streamCategoryIDList')->fromArray($categories);
     }
 
     $row = $form->addRow();

@@ -59,7 +59,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/categories_manage_e
     }
 
     // Validate that this record is unique
-    if (!$categoryGateway->unique($pdo, $data['name'], $streamCategoryID)) {
+    if (!$categoryGateway->unique($data, ['name'], $streamCategoryID)) {
         $URL .= '&return=error7';
         header("Location: {$URL}");
         exit;

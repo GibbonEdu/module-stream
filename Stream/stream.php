@@ -31,8 +31,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
 } else {
     // Proceed!
     $urlParams = [
-        'tag' => $_GET['tag'] ?? '',
-        'user' => $_GET['user'] ?? '',
+        'streamCategoryID' => $_GET['streamCategoryID'] ?? '',
+        'category' => $_GET['category'] ?? '',
+        'tag'      => $_GET['tag'] ?? '',
+        'user'     => $_GET['user'] ?? '',
     ];
 
     $page->scripts->add('magnific', 'modules/Stream/js/magnific/jquery.magnific-popup.min.js');
@@ -41,7 +43,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
     $page->breadcrumbs
         ->add(__m('View Stream'), 'stream.php');
 
-    if (!empty($urlParams['tag']) || !empty($urlParams['user'])) {
+    if (!empty($urlParams['category'])) {
+        $page->breadcrumbs->add(__('Category').': '.$urlParams['category']);
+    } else if (!empty($urlParams['tag']) || !empty($urlParams['user'])) {
         $page->breadcrumbs->add(__('Viewing {filter}', [
             'filter' => !empty($urlParams['user']) ? $urlParams['user'] : '#' . $urlParams['tag']
         ]));
@@ -53,13 +57,25 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
 
     // QUERY
     $postGateway = $container->get(PostGateway::class);
+    $categoryGateway = $container->get(CategoryGateway::class);
     $gibbonSchoolYearID = $gibbon->session->get('gibbonSchoolYearID');
 
     $criteria = $postGateway->newQueryCriteria(true)
         ->sortBy(['timestamp'], 'DESC')
+        ->filterBy('category', $urlParams['streamCategoryID'])
         ->filterBy('tag', $urlParams['tag'])
         ->filterBy('user', $urlParams['user'])
         ->fromPOST();
+
+    $categories = $categoryGateway->selectViewableCategoriesByRole($gibbon->session->get('gibbonRoleIDCurrent'), '2019-11-21 08:00:00')->fetchGroupedUnique();
+    if (!empty($categories)) {
+        $categories = array_merge([0 => ['name' => __('All'), 'streamCategoryID' => 0]], $categories);
+    }
+
+    if (!empty($urlParams['streamCategoryID']) && empty($categories[$urlParams['streamCategoryID']])) {
+        $page->addError(__('You do not have access to this action.'));
+        return;
+    }
 
     $stream = $postGateway->queryPostsBySchoolYear($criteria, $gibbonSchoolYearID);
 
@@ -80,40 +96,40 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
     // RENDER STREAM
     echo $page->fetchFromTemplate('stream.twig.html', [
         'stream' => $stream,
+        'categories' => $categories,
+        'currentCategory' => $urlParams['streamCategoryID'],
     ]);
 
-    // NEW POST
-    $form = Form::create('block', $gibbon->session->get('absoluteURL').'/modules/Stream/posts_manage_addProcess.php');
-    $form->addHiddenValue('address', $gibbon->session->get('address'));
-    $form->addHiddenValue('source', 'stream');
-
-    $postLength = $container->get(SettingGateway::class)->getSettingByScope('Stream', 'postLength');
-    $col = $form->addRow()->addColumn();
-        $col->addTextArea('post')->required()->setRows(6)->addClass('font-sans text-sm')->maxLength($postLength);
-
-    $row = $form->addRow()->addDetails()->summary(__('Add Photos'));
-        $row->addFileUpload('attachments')->accepts('.jpg,.jpeg,.gif,.png')->uploadMultiple(true);
-
-    //Categories
-    $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
     $categoryGateway = $container->get(CategoryGateway::class);
-    $criteria = $categoryGateway->newQueryCriteria(true);
-    $categories = $categoryGateway->queryCategories($criteria);
-    $categoriesArray = array();
-    foreach ($categories AS $category) {
-        if ($category[strtolower($roleCategory).'Access'] == 'Post') {
-            $categoriesArray[$category['streamCategoryID']] = $category['name'];
+    $categories = $categoryGateway->selectPostableCategoriesByRole($gibbon->session->get('gibbonRoleIDCurrent'))->fetchKeyPair();
+
+    // NEW POST
+    // Ensure user has access to post in this category
+    if (empty($urlParams['streamCategoryID']) || !empty($categories[$urlParams['streamCategoryID']])) {
+        $form = Form::create('block', $gibbon->session->get('absoluteURL').'/modules/Stream/posts_manage_addProcess.php');
+        $form->addHiddenValue('address', $gibbon->session->get('address'));
+        $form->addHiddenValue('source', 'stream');
+
+        $postLength = $container->get(SettingGateway::class)->getSettingByScope('Stream', 'postLength');
+        $col = $form->addRow()->addColumn();
+            $col->addTextArea('post')->required()->setRows(6)->addClass('font-sans text-sm')->maxLength($postLength);
+
+        $row = $form->addRow()->addDetails()->summary(__('Add Photos'));
+            $row->addFileUpload('attachments')->accepts('.jpg,.jpeg,.gif,.png')->uploadMultiple(true);
+
+        // Categories
+        if (!empty($urlParams['streamCategoryID'])) {
+            $form->addHiddenValue('streamCategoryIDList', $urlParams['streamCategoryID']);
+        } else if (!empty($categories)) {
+            $row = $form->addRow()->addDetails()->summary(__('Categories'));
+                $row->addCheckbox('streamCategoryIDList')->fromArray($categories);
         }
-    }
-    if (count($categoriesArray) > 0 ) {
-        $row = $form->addRow()->addDetails()->summary(__('Categories'));
-            $row->addCheckbox('streamCategoryIDList')->fromArray($categoriesArray);
-    }
 
-    $row = $form->addRow()->addSubmit(__('Post'));
+        $row = $form->addRow()->addSubmit(__('Post'));
 
-    $_SESSION[$guid]['sidebarExtra'] .= '<h5 class="mt-4 mb-2 text-xs pb-0 ">'.__('New Post').'</h5>';
-    $_SESSION[$guid]['sidebarExtra'] .= $form->getOutput();
+        $_SESSION[$guid]['sidebarExtra'] .= '<h5 class="mt-4 mb-2 text-xs pb-0 ">'.__('New Post').'</h5>';
+        $_SESSION[$guid]['sidebarExtra'] .= $form->getOutput();
+    }
 
     // RECENT TAGS
     $tags = $container->get(PostTagGateway::class)->selectRecentTagsBySchoolYear($gibbonSchoolYearID)->fetchAll(\PDO::FETCH_COLUMN, 0);

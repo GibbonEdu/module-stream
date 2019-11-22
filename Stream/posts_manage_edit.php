@@ -92,8 +92,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_edit.p
                     ->setIcon('garbage')
                     ->directLink();
             });
-
-        // echo $table->render(new DataSet($attachments));
     }
 
 
@@ -101,21 +99,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_edit.p
         $row->addLabel('attachments', __('Attachments'));
         $row->addFileUpload('attachments')->accepts('.jpg,.jpeg,.gif,.png')->uploadMultiple(true);
 
-        $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
-        $categoryGateway = $container->get(CategoryGateway::class);
-        $criteria = $categoryGateway->newQueryCriteria(true);
-        $categories = $categoryGateway->queryCategories($criteria);
-        $categoriesArray = array();
-        foreach ($categories AS $category) {
-            if ($category[strtolower($roleCategory).'Access'] == 'Post') {
-                $categoriesArray[$category['streamCategoryID']] = $category['name'];
-            }
-        }
-        if (count($categoriesArray) > 0 ) {
-            $row = $form->addRow();
-                $row->addLabel('streamCategoryIDList', __('Categories'));
-                $row->addCheckbox('streamCategoryIDList')->fromArray($categoriesArray);
-        }
+    // CATEGORIES
+    $categoryGateway = $container->get(CategoryGateway::class);
+    $categories = $categoryGateway->selectPostableCategoriesByRole($gibbon->session->get('gibbonRoleIDCurrent'))->fetchKeyPair();
+
+    if (!empty($categories)) {
+        $values['streamCategoryIDList'] = explode(',', $values['streamCategoryIDList']);
+        $row = $form->addRow();
+            $row->addLabel('streamCategoryIDList', __('Categories'));
+            $row->addCheckbox('streamCategoryIDList')->fromArray($categories);
+    }
 
     $row = $form->addRow();
         $row->addFooter();
@@ -124,22 +117,4 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_edit.p
     $form->loadAllValuesFrom($values);
 
     echo $form->getOutput();
-
-
-
-
-    // $form = Form::create('attachments', $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module').'/posts_manage_edit_addProcess.php');
-    // $form->setFactory(DatabaseFormFactory::create($pdo));
-
-    // $form->addHiddenValue('address', $gibbon->session->get('address'));
-    // $form->addHiddenValue('streamPostID', $streamPostID);
-
-    // $row = $form->addRow()->addHeading(__('Add'));
-
-
-
-    // $row = $form->addRow();
-    //     $row->addSubmit();
-
-    // echo $form->getOutput();
 }
