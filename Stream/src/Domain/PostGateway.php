@@ -35,7 +35,7 @@ class PostGateway extends QueryableGateway
      * @param QueryCriteria $criteria
      * @return DataSet
      */
-    public function queryPostsBySchoolYear(QueryCriteria $criteria, $gibbonSchoolYearID, $gibbonPersonID = null)
+    public function queryPostsBySchoolYear(QueryCriteria $criteria, $gibbonSchoolYearID, $gibbonPersonID = null, $gibbonRoleID = null)
     {
         $query = $this
             ->newQuery()
@@ -44,6 +44,7 @@ class PostGateway extends QueryableGateway
             ->cols(['streamPost.streamPostID', 'streamPost.post', 'streamPost.timestamp', 'gibbonPerson.title', 'gibbonPerson.preferredName', 'gibbonPerson.surname', 'gibbonPerson.username', 'gibbonPerson.image_240'])
             ->innerJoin('gibbonPerson', 'gibbonPerson.gibbonPersonID=streamPost.gibbonPersonID')
             ->leftJoin('streamPostTag', 'streamPostTag.streamPostID=streamPost.streamPostID')
+            ->leftJoin('streamCategory', 'FIND_IN_SET(streamCategory.streamCategoryID, streamPost.streamCategoryIDList)')
             ->where('streamPost.gibbonSchoolYearID=:gibbonSchoolYearID')
             ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID)
             ->groupBy(['streamPost.streamPostID']);
@@ -52,6 +53,18 @@ class PostGateway extends QueryableGateway
             $query->where('streamPost.gibbonPersonID=:gibbonPersonID')
                   ->bindValue('gibbonPersonID', $gibbonPersonID);
         }
+
+        if (!empty($gibbonRoleID)) {
+            $query->innerJoin('gibbonRole', "( (streamPost.streamCategoryIDList IS NULL OR streamPost.streamCategoryIDList = '')
+                    OR (gibbonRole.category = 'Staff' AND (streamCategory.staffAccess='View' OR streamCategory.staffAccess='Post')) 
+                    OR (gibbonRole.category = 'Student' AND (streamCategory.studentAccess='View' OR streamCategory.studentAccess='Post'))
+                    OR (gibbonRole.category = 'Parent' AND (streamCategory.parentAccess='View' OR streamCategory.parentAccess='Post'))
+                    OR (gibbonRole.category = 'Other' AND (streamCategory.otherAccess='View' OR streamCategory.otherAccess='Post'))
+                )")
+                ->where('gibbonRole.gibbonRoleID=:gibbonRoleID')
+                  ->bindValue('gibbonRoleID', $gibbonRoleID);
+        }
+
         $criteria->addFilterRules([
             'category' => function ($query, $category) {
                 return $query

@@ -78,7 +78,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
         return;
     }
 
-    $stream = $postGateway->queryPostsBySchoolYear($criteria, $gibbonSchoolYearID);
+    $stream = $postGateway->queryPostsBySchoolYear($criteria, $gibbonSchoolYearID, null, $gibbon->session->get('gibbonRoleIDCurrent'));
 
     // Join a set of attachment data per post
     $streamPosts = $stream->getColumn('streamPostID');
@@ -106,7 +106,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
 
     // NEW POST
     // Ensure user has access to post in this category
-    if (empty($urlParams['streamCategoryID']) || !empty($categories[$urlParams['streamCategoryID']])) {
+    if (!empty($categories) && (empty($urlParams['streamCategoryID']) || !empty($categories[$urlParams['streamCategoryID']]))) {
         $form = Form::create('block', $gibbon->session->get('absoluteURL').'/modules/Stream/posts_manage_addProcess.php');
         $form->addHiddenValue('address', $gibbon->session->get('address'));
         $form->addHiddenValue('source', 'stream');
