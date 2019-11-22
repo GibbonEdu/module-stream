@@ -58,9 +58,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/categories_manage.p
         ->sortable(['streamCategory.name']);
 
     $table->addColumn('staffAccess', __m('Staff Access'));
-    $table->addColumn('studentAccess', __m('Staff Access'));
-    $table->addColumn('parentAccess', __m('Staff Access'));
-    $table->addColumn('otherAccess', __m('Staff Access'));
+    $table->addColumn('studentAccess', __m('Student Access'));
+    $table->addColumn('parentAccess', __m('Parent Access'));
+    $table->addColumn('otherAccess', __m('Other Access'));
 
     // ACTIONS
     $table->addActionColumn()

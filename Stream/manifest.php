@@ -44,10 +44,10 @@ $moduleTables[] = "CREATE TABLE `streamCategory` (
   `streamCategoryID` INT(3) unsigned zerofill NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL DEFAULT '',
   `active` ENUM('Y','N') NOT NULL DEFAULT 'Y',
-  `staffAccess` ENUM('None','Can View', 'Can Post') NOT NULL DEFAULT 'None',
-  `studentAccess` ENUM('None','Can View', 'Can Post') NOT NULL DEFAULT 'None',
-  `parentAccess` ENUM('None','Can View', 'Can Post') NOT NULL DEFAULT 'None',
-  `otherAccess` ENUM('None','Can View', 'Can Post') NOT NULL DEFAULT 'None',
+  `staffAccess` ENUM('None','View','Post') NOT NULL DEFAULT 'None',
+  `studentAccess` ENUM('None','View','Post') NOT NULL DEFAULT 'None',
+  `parentAccess` ENUM('None','View','Post') NOT NULL DEFAULT 'None',
+  `otherAccess` ENUM('None','View','Post') NOT NULL DEFAULT 'None',
   PRIMARY KEY (`streamCategoryID`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";

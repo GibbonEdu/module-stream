@@ -22,6 +22,7 @@ use Gibbon\Forms\DatabaseFormFactory;
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\Stream\Domain\PostGateway;
 use Gibbon\Module\Stream\Domain\PostAttachmentGateway;
+use Gibbon\Module\Stream\Domain\CategoryGateway;
 use Gibbon\Tables\DataTable;
 use Gibbon\Domain\DataSet;
 use Gibbon\Services\Format;
@@ -100,15 +101,31 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_edit.p
         $row->addLabel('attachments', __('Attachments'));
         $row->addFileUpload('attachments')->accepts('.jpg,.jpeg,.gif,.png')->uploadMultiple(true);
 
+        $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
+        $categoryGateway = $container->get(CategoryGateway::class);
+        $criteria = $categoryGateway->newQueryCriteria(true);
+        $categories = $categoryGateway->queryCategories($criteria);
+        $categoriesArray = array();
+        foreach ($categories AS $category) {
+            if ($category[strtolower($roleCategory).'Access'] == 'Post') {
+                $categoriesArray[$category['streamCategoryID']] = $category['name'];
+            }
+        }
+        if (count($categoriesArray) > 0 ) {
+            $row = $form->addRow();
+                $row->addLabel('streamCategoryIDList', __('Categories'));
+                $row->addCheckbox('streamCategoryIDList')->fromArray($categoriesArray);
+        }
+
     $row = $form->addRow();
         $row->addFooter();
         $row->addSubmit();
-
+        
     $form->loadAllValuesFrom($values);
 
     echo $form->getOutput();
 
-    
+
 
 
     // $form = Form::create('attachments', $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module').'/posts_manage_edit_addProcess.php');
@@ -119,7 +136,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_edit.p
 
     // $row = $form->addRow()->addHeading(__('Add'));
 
-    
+
 
     // $row = $form->addRow();
     //     $row->addSubmit();

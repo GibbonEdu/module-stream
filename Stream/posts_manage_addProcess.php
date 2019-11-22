@@ -23,6 +23,7 @@ use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\Stream\Domain\PostGateway;
 use Gibbon\Module\Stream\Domain\PostTagGateway;
 use Gibbon\Module\Stream\Domain\PostAttachmentGateway;
+use Gibbon\Module\Stream\Domain\CategoryGateway;
 
 $_POST['address'] = '/modules/Stream/stream_postProcess.php';
 
@@ -42,14 +43,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.ph
     $postGateway = $container->get(PostGateway::class);
     $postTagGateway = $container->get(PostTagGateway::class);
     $postAttachmentGateway = $container->get(PostAttachmentGateway::class);
-    
+    $categoryGateway = $container->get(CategoryGateway::class);
+
     $partialFail = false;
 
     $data = [
-        'gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'),
-        'gibbonPersonID'     => $gibbon->session->get('gibbonPersonID'),
-        'post'               => $_POST['post'] ?? '',
-        'timestamp'          => date('Y-m-d H:i:s'),
+        'gibbonSchoolYearID'    => $gibbon->session->get('gibbonSchoolYearID'),
+        'gibbonPersonID'        => $gibbon->session->get('gibbonPersonID'),
+        'post'                  => $_POST['post'] ?? '',
+        'streamCategoryIDList'  => (!empty($_POST['streamCategoryIDList']) &&(is_array($_POST['streamCategoryIDList'])) ? implode(",", $_POST['streamCategoryIDList']) : null),
+        'timestamp'             => date('Y-m-d H:i:s'),
     ];
 
     // Validate the required values are present
@@ -84,7 +87,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.ph
         foreach ($_FILES['attachments']['name'] as $index => $name) {
             $file = array_combine(array_keys($_FILES['attachments']), array_column($_FILES['attachments'], $index));
             $attachment = $fileUploader->uploadAndResizeImage($file, 'streamPhoto', $maxImageSize, 90);
-            
+
             if (!empty($attachment)) {
                 $thumbPath = $absolutePath.'/'.str_replace('streamPhoto', 'streamThumb', $attachment);
                 $thumbnail = $fileUploader->resizeImage($absolutePath.'/'.$attachment, $thumbPath, 650);

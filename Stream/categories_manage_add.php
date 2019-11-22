@@ -52,8 +52,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/categories_manage_a
 
     $options = array(
         "None" => __m('None'),
-        "Can View" => __m('Can View'),
-        "Can Post" => __m('Can Post')
+        "View" => __m('View'),
+        "Post" => __m('Post')
     );
     $row = $form->addRow();
         $row->addLabel('staffAccess', __m('Staff Access'));

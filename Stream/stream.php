@@ -23,6 +23,7 @@ use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\Stream\Domain\PostGateway;
 use Gibbon\Module\Stream\Domain\PostTagGateway;
 use Gibbon\Module\Stream\Domain\PostAttachmentGateway;
+use Gibbon\Module\Stream\Domain\CategoryGateway;
 
 if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == false) {
     // Access denied
@@ -92,6 +93,22 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
 
     $row = $form->addRow()->addDetails()->summary(__('Add Photos'));
         $row->addFileUpload('attachments')->accepts('.jpg,.jpeg,.gif,.png')->uploadMultiple(true);
+
+    //Categories
+    $roleCategory = getRoleCategory($gibbon->session->get('gibbonRoleIDCurrent'), $connection2);
+    $categoryGateway = $container->get(CategoryGateway::class);
+    $criteria = $categoryGateway->newQueryCriteria(true);
+    $categories = $categoryGateway->queryCategories($criteria);
+    $categoriesArray = array();
+    foreach ($categories AS $category) {
+        if ($category[strtolower($roleCategory).'Access'] == 'Post') {
+            $categoriesArray[$category['streamCategoryID']] = $category['name'];
+        }
+    }
+    if (count($categoriesArray) > 0 ) {
+        $row = $form->addRow()->addDetails()->summary(__('Categories'));
+            $row->addCheckbox('streamCategoryIDList')->fromArray($categoriesArray);
+    }
 
     $row = $form->addRow()->addSubmit(__('Post'));
 

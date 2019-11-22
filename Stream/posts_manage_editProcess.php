@@ -40,9 +40,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_edit.p
     $postTagGateway = $container->get(PostTagGateway::class);
     $postAttachmentGateway = $container->get(PostAttachmentGateway::class);
     $partialFail = false;
-    
+
     $data = [
         'post' => $_POST['post'] ?? '',
+        'streamCategoryIDList'  => (!empty($_POST['streamCategoryIDList']) &&(is_array($_POST['streamCategoryIDList'])) ? implode(",", $_POST['streamCategoryIDList']) : null)
     ];
 
     // Validate the required values are present
@@ -86,7 +87,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_edit.p
         foreach ($_FILES['attachments']['name'] as $index => $name) {
             $file = array_combine(array_keys($_FILES['attachments']), array_column($_FILES['attachments'], $index));
             $attachment = $fileUploader->uploadAndResizeImage($file, 'streamPhoto', $maxImageSize, 90);
-            
+
             if (!empty($attachment)) {
                 $thumbPath = $absolutePath.'/'.str_replace('streamPhoto', 'streamThumb', $attachment);
                 $thumbnail = $fileUploader->resizeImage($absolutePath.'/'.$attachment, $thumbPath, 650);
