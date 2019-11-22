@@ -32,7 +32,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
 } else {
     // Proceed!
     $urlParams = [
-        'streamCategoryID' => $_GET['streamCategoryID'] ?? '',
+        'streamCategoryID' => $_REQUEST['streamCategoryID'] ?? '',
         'category' => $_GET['category'] ?? '',
         'tag'      => $_GET['tag'] ?? '',
         'user'     => $_GET['user'] ?? '',
@@ -69,10 +69,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
         ->filterBy('user', $urlParams['user'])
         ->fromPOST();
 
-    $yesterday = DateTime::createFromFormat('Y-m-d H:i:s', 'Yesterday');
-    $viewed = $categoryViewedGateway->selectBy(['gibbonPersonID' => $gibbon->session->get('gibbonPersonID'), 'streamCategoryID' => $urlParams['streamCategoryID']])->fetch();
+    $stream = $postGateway->queryPostsBySchoolYear($criteria, $gibbonSchoolYearID, null, $gibbon->session->get('gibbonRoleIDCurrent'));
 
-    $categories = $categoryGateway->selectViewableCategoriesByRole($gibbon->session->get('gibbonRoleIDCurrent'), $viewed['timestamp'] ?? $yesterday)->fetchGroupedUnique();
+    // Get viewable categories
+    $categories = $categoryGateway->selectViewableCategoriesByPerson($gibbon->session->get('gibbonPersonID'))->fetchGroupedUnique();
     if (!empty($categories)) {
         $categories = array_merge([0 => ['name' => __('All'), 'streamCategoryID' => 0]], $categories);
     }
@@ -82,16 +82,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
         return;
     }
 
-    if (!empty($urlParams['streamCategoryID'])) {
+    $currentCategory = $categories[$urlParams['streamCategoryID']] ?? [];
+
+    // Update current category timestamp
+    if (!empty($currentCategory)) {
         $data = [
             'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'),
-            'streamCategoryID' => $urlParams['streamCategoryID'],
+            'streamCategoryID' => $currentCategory['streamCategoryID'],
             'timestamp' => date('Y-m-d H:i:s'),
         ];
-        $categoryViewedGateway->insertAndUpdate($data, $data);
+        $updated = $categoryViewedGateway->insertAndUpdate($data, ['timestamp' => date('Y-m-d H:i:s')]);
     }
-
-    $stream = $postGateway->queryPostsBySchoolYear($criteria, $gibbonSchoolYearID, null, $gibbon->session->get('gibbonRoleIDCurrent'));
 
     // Join a set of attachment data per post
     $streamPosts = $stream->getColumn('streamPostID');
@@ -111,7 +112,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
     echo $page->fetchFromTemplate('stream.twig.html', [
         'stream' => $stream,
         'categories' => $categories,
-        'currentCategory' => $urlParams['streamCategoryID'],
+        'currentCategory' => $currentCategory,
     ]);
 
     $categoryGateway = $container->get(CategoryGateway::class);
@@ -119,7 +120,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
 
     // NEW POST
     // Ensure user has access to post in this category
-    if (!empty($categories) && (empty($urlParams['streamCategoryID']) || !empty($categories[$urlParams['streamCategoryID']]))) {
+    $canPost = !empty($categories) && (empty($urlParams['streamCategoryID']) || !empty($categories[$urlParams['streamCategoryID']]));
+    if ($canPost && isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.php')) {
         $form = Form::create('block', $gibbon->session->get('absoluteURL').'/modules/Stream/posts_manage_addProcess.php');
         $form->addHiddenValue('address', $gibbon->session->get('address'));
         $form->addHiddenValue('source', 'stream');

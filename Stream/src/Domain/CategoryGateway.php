@@ -54,17 +54,18 @@ class CategoryGateway extends QueryableGateway
         return $this->runQuery($query, $criteria);
     }
 
-    public function selectViewableCategoriesByRole($gibbonRoleID, $timestamp)
+    public function selectViewableCategoriesByPerson($gibbonPersonID)
     {
         $query = $this
             ->newSelect()
-            ->from('gibbonRole')
-            ->cols(['streamCategory.streamCategoryID as groupBy', 'streamCategory.streamCategoryID', 'streamCategory.name', 'streamCategory.active', 'staffAccess', 'studentAccess', 'parentAccess', 'otherAccess', "COUNT(DISTINCT CASE WHEN streamPost.timestamp>:timestamp THEN streamPost.streamPostID END) as recentPosts"])
+            ->from('gibbonPerson')
+            ->cols(['streamCategory.streamCategoryID as groupBy', 'streamCategory.streamCategoryID', 'streamCategory.name', 'streamCategory.active', 'staffAccess', 'studentAccess', 'parentAccess', 'otherAccess', 'streamCategoryViewed.timestamp', "COUNT(DISTINCT CASE WHEN streamPost.timestamp>streamCategoryViewed.timestamp THEN streamPost.streamPostID END) as recentPosts"])
+            ->innerJoin('gibbonRole', 'FIND_IN_SET(gibbonRole.gibbonRoleID, gibbonPerson.gibbonRoleIDAll)')
             ->innerJoin('streamCategory', "streamCategory.active='Y'")
+            ->leftJoin('streamCategoryViewed', "streamCategoryViewed.streamCategoryID=streamCategory.streamCategoryID AND streamCategoryViewed.gibbonPersonID=gibbonPerson.gibbonPersonID")
             ->leftJoin('streamPost', 'FIND_IN_SET(streamCategory.streamCategoryID, streamPost.streamCategoryIDList)')
-            ->where('gibbonRole.gibbonRoleID=:gibbonRoleID')
-            ->bindValue('gibbonRoleID', $gibbonRoleID)
-            ->bindValue('timestamp', $timestamp)
+            ->where('gibbonPerson.gibbonPersonID=:gibbonPersonID')
+            ->bindValue('gibbonPersonID', $gibbonPersonID)
             ->where("((gibbonRole.category = 'Staff' AND (streamCategory.staffAccess='View' OR streamCategory.staffAccess='Post')) 
                 OR (gibbonRole.category = 'Student' AND (streamCategory.studentAccess='View' OR streamCategory.studentAccess='Post'))
                 OR (gibbonRole.category = 'Parent' AND (streamCategory.parentAccess='View' OR streamCategory.parentAccess='Post'))

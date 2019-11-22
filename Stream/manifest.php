@@ -58,7 +58,7 @@ $moduleTables[] = "CREATE TABLE `streamCategoryViewed` (
     `streamCategoryID` INT(3) unsigned zerofill NOT NULL,
     `timestamp` TIMESTAMP NULL,
     PRIMARY KEY (`streamCategoryViewedID`),
-    KEY `gibbonPersonID` (`gibbonPersonID`, `streamCategoryID`)
+    UNIQUE KEY `lastViewed` (`gibbonPersonID`, `streamCategoryID`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
 $moduleTables[] = "CREATE TABLE `streamPostTag` (
