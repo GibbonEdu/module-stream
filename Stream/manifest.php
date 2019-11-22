@@ -52,6 +52,15 @@ $moduleTables[] = "CREATE TABLE `streamCategory` (
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
+$moduleTables[] = "CREATE TABLE `streamCategoryViewed` (
+    `streamCategoryViewedID` INT(10) unsigned zerofill NOT NULL AUTO_INCREMENT,
+    `gibbonPersonID` INT(10) unsigned zerofill NOT NULL,
+    `streamCategoryID` INT(3) unsigned zerofill NOT NULL,
+    `timestamp` TIMESTAMP NULL,
+    PRIMARY KEY (`streamCategoryViewedID`),
+    KEY `gibbonPersonID` (`gibbonPersonID`, `streamCategoryID`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+
 $moduleTables[] = "CREATE TABLE `streamPostTag` (
   `streamPostTagID` INT(11) unsigned zerofill NOT NULL AUTO_INCREMENT,
   `streamPostID` INT(10) unsigned zerofill DEFAULT NULL,
@@ -69,6 +78,7 @@ $moduleTables[] = "CREATE TABLE `streamPostAttachment` (
   PRIMARY KEY (`streamPostAttachmentID`),
   KEY `streamPostID` (`streamPostID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+
 
 //Settings
 $gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Stream', 'postLength', 'Post Length', 'Maximum number of characters in a post.', '280');";

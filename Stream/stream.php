@@ -24,6 +24,7 @@ use Gibbon\Module\Stream\Domain\PostGateway;
 use Gibbon\Module\Stream\Domain\PostTagGateway;
 use Gibbon\Module\Stream\Domain\PostAttachmentGateway;
 use Gibbon\Module\Stream\Domain\CategoryGateway;
+use Gibbon\Module\Stream\Domain\CategoryViewedGateway;
 
 if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == false) {
     // Access denied
@@ -58,6 +59,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
     // QUERY
     $postGateway = $container->get(PostGateway::class);
     $categoryGateway = $container->get(CategoryGateway::class);
+    $categoryViewedGateway = $container->get(CategoryViewedGateway::class);
     $gibbonSchoolYearID = $gibbon->session->get('gibbonSchoolYearID');
 
     $criteria = $postGateway->newQueryCriteria(true)
@@ -67,8 +69,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
         ->filterBy('user', $urlParams['user'])
         ->fromPOST();
 
-    $date = DateTime::createFromFormat('Y-m-d H:i:s', 'Yesterday');
-    $categories = $categoryGateway->selectViewableCategoriesByRole($gibbon->session->get('gibbonRoleIDCurrent'), $date)->fetchGroupedUnique();
+    $yesterday = DateTime::createFromFormat('Y-m-d H:i:s', 'Yesterday');
+    $viewed = $categoryViewedGateway->selectBy(['gibbonPersonID' => $gibbon->session->get('gibbonPersonID'), 'streamCategoryID' => $urlParams['streamCategoryID']])->fetch();
+
+    $categories = $categoryGateway->selectViewableCategoriesByRole($gibbon->session->get('gibbonRoleIDCurrent'), $viewed['timestamp'] ?? $yesterday)->fetchGroupedUnique();
     if (!empty($categories)) {
         $categories = array_merge([0 => ['name' => __('All'), 'streamCategoryID' => 0]], $categories);
     }
@@ -76,6 +80,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
     if (!empty($urlParams['streamCategoryID']) && empty($categories[$urlParams['streamCategoryID']])) {
         $page->addError(__('You do not have access to this action.'));
         return;
+    }
+
+    if (!empty($urlParams['streamCategoryID'])) {
+        $data = [
+            'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'),
+            'streamCategoryID' => $urlParams['streamCategoryID'],
+            'timestamp' => date('Y-m-d H:i:s'),
+        ];
+        $categoryViewedGateway->insertAndUpdate($data, $data);
     }
 
     $stream = $postGateway->queryPostsBySchoolYear($criteria, $gibbonSchoolYearID, null, $gibbon->session->get('gibbonRoleIDCurrent'));
