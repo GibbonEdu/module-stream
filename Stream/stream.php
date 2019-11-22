@@ -33,9 +33,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
     // Proceed!
     $urlParams = [
         'streamCategoryID' => $_REQUEST['streamCategoryID'] ?? '',
-        'category' => $_GET['category'] ?? '',
-        'tag'      => $_GET['tag'] ?? '',
-        'user'     => $_GET['user'] ?? '',
+        'category' => $_REQUEST['category'] ?? '',
+        'tag'      => $_REQUEST['tag'] ?? '',
+        'user'     => $_REQUEST['user'] ?? '',
     ];
 
     $page->scripts->add('magnific', 'modules/Stream/js/magnific/jquery.magnific-popup.min.js');
@@ -69,7 +69,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
         ->filterBy('user', $urlParams['user'])
         ->fromPOST();
 
+    // Get the stream, join a set of attachment data per post
     $stream = $postGateway->queryPostsBySchoolYear($criteria, $gibbonSchoolYearID, null, $gibbon->session->get('gibbonRoleIDCurrent'));
+    $streamPosts = $stream->getColumn('streamPostID');
+    $attachments = $container->get(PostAttachmentGateway::class)->selectAttachmentsByPost($streamPosts)->fetchGrouped();
+    $stream->joinColumn('streamPostID', 'attachments', $attachments);
 
     // Get viewable categories
     $categories = $categoryGateway->selectViewableCategoriesByPerson($gibbon->session->get('gibbonPersonID'))->fetchGroupedUnique();
@@ -94,13 +98,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
         $updated = $categoryViewedGateway->insertAndUpdate($data, ['timestamp' => date('Y-m-d H:i:s')]);
     }
 
-    // Join a set of attachment data per post
-    $streamPosts = $stream->getColumn('streamPostID');
-    $attachments = $container->get(PostAttachmentGateway::class)->selectAttachmentsByPost($streamPosts)->fetchGrouped();
-    $stream->joinColumn('streamPostID', 'attachments', $attachments);
-
     // Auto-link hashtags
-    $stream = array_map(function ($item) {
+    $streamData = array_map(function ($item) {
         $item['post'] = preg_replace_callback('/([#]+)([\w]+)/iu', function ($matches) {
             return Format::link('./index.php?q=/modules/Stream/stream.php&tag=' . $matches[2], $matches[1] . $matches[2]);
         }, $item['post']);
@@ -110,7 +109,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
 
     // RENDER STREAM
     echo $page->fetchFromTemplate('stream.twig.html', [
-        'stream' => $stream,
+        'stream' => $streamData,
+        'pageNumber' => $stream->getPage(),
+        'pageCount' => $stream->getPageCount(),
         'categories' => $categories,
         'currentCategory' => $currentCategory,
     ]);
@@ -144,8 +145,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
 
         $row = $form->addRow()->addSubmit(__('Post'));
 
+        $_SESSION[$guid]['sidebarExtra'] .= '<div class="column-no-break">';
         $_SESSION[$guid]['sidebarExtra'] .= '<h5 class="mt-4 mb-2 text-xs pb-0 ">'.__('New Post').'</h5>';
         $_SESSION[$guid]['sidebarExtra'] .= $form->getOutput();
+        $_SESSION[$guid]['sidebarExtra'] .= '</div>';
     }
 
     // RECENT TAGS
@@ -157,6 +160,31 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
 ?>
 <script>
     $(document).ready(function() {
+        var pageNum = <?php echo $stream->getPage(); ?>;
+        var pageTotal = <?php echo $stream->getPageCount(); ?>;
+
+        $('#loadPosts').click(function() {
+            pageNum++;
+            
+            $.ajax({
+                url: "<?php echo $gibbon->session->get('absoluteURL'); ?>/modules/Stream/streamAjax.php",
+                data: {
+                    streamCategoryID: '<?php echo $urlParams['streamCategoryID']; ?>',
+                    page: pageNum,
+                },
+                type: 'POST',
+                success: function(data) {
+                    if (data) {
+                        $('#stream').append(data);
+
+                        if (pageNum >= pageTotal) {
+                            $('#loadPosts').remove();
+                        }
+                    }
+                },
+            });
+        });
+        
         $('.image-container').magnificPopup({
             type: 'image',
             delegate: 'a',
