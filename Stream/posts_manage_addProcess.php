@@ -24,6 +24,7 @@ use Gibbon\Module\Stream\Domain\PostGateway;
 use Gibbon\Module\Stream\Domain\PostTagGateway;
 use Gibbon\Module\Stream\Domain\PostAttachmentGateway;
 use Gibbon\Module\Stream\Domain\CategoryGateway;
+use Gibbon\Data\Validator;
 
 $_POST['address'] = '/modules/Stream/stream_postProcess.php';
 
@@ -49,6 +50,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.ph
 
     $partialFail = false;
 
+    // Sanitize the whole $_POST array
+    $validator = new Validator();
+    $_POST = $validator->sanitize($_POST);
+    
     $data = [
         'gibbonSchoolYearID'    => $gibbon->session->get('gibbonSchoolYearID'),
         'gibbonPersonID'        => $gibbon->session->get('gibbonPersonID'),

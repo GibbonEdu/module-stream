@@ -7,10 +7,12 @@ For info about editing, see: https://twig.symfony.com/doc/2.x/
 -->#}
 
 {% if categories %}
-<div class="flex rounded-t border border-b-6 bg-white overflow-x-auto">
+<div class="flex rounded-t border border-b-0 bg-white overflow-x-auto">
     
     {% for category in categories %}
 
+    {% set isActive = currentCategory.streamCategoryID == category.streamCategoryID or (currentCategory is empty and category.streamCategoryID == 0) %}
+    
     <a class="relative block px-8 py-5 text-gray-700 hover:text-blue-700 hover:bg-gray-100" href="{{ absoluteURL }}/index.php?q=/modules/Stream/stream.php{{ category.streamCategoryID > 0 ? '&category='~category.name~'&streamCategoryID='~category.streamCategoryID }}">
         <div class="relative mt-1 text-base font-bold uppercase">
             {{ category.name }}
@@ -20,16 +22,17 @@ For info about editing, see: https://twig.symfony.com/doc/2.x/
             {% endif %}
         </div>
 
-        {% if currentCategory.streamCategoryID == category.streamCategoryID or (currentCategory is empty and category.streamCategoryID == 0) %}
-            <div class="absolute bottom-0 border-transparent" style="left: 50%; margin: 15px 0 0 -9px; border-width: 9px; border-bottom-color: #d2d0d0;"></div>
+        {% if isActive %}
+            <div class="absolute bottom-0 border-transparent" style="left: 50%; margin: 15px 0 0 -9px; border-width: 9px; border-bottom-color: #aa8adb;"></div>
         {% endif %}
     </a>
     {% endfor %}
 </div>
+<div class="h-2 bg-purple-500"></div>
 {% endif %}
 
 {% if stream %}
-    <div id="stream" class="rounded-b border border-b-0 overflow-hidden">
+    <div id="stream" class="rounded-b border-l border-r overflow-hidden">
     {% include 'streamPosts.twig.html' %}
     </div>
 

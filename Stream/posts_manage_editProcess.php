@@ -22,6 +22,7 @@ use Gibbon\Module\Stream\Domain\PostGateway;
 use Gibbon\Module\Stream\Domain\PostTagGateway;
 use Gibbon\Module\Stream\Domain\PostAttachmentGateway;
 use Gibbon\Domain\System\SettingGateway;
+use Gibbon\Data\Validator;
 
 require_once '../../gibbon.php';
 
@@ -40,6 +41,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_edit.p
     $postTagGateway = $container->get(PostTagGateway::class);
     $postAttachmentGateway = $container->get(PostAttachmentGateway::class);
     $partialFail = false;
+
+    // Sanitize the whole $_POST array
+    $validator = new Validator();
+    $_POST = $validator->sanitize($_POST);
 
     $data = [
         'post' => $_POST['post'] ?? '',

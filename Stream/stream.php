@@ -123,7 +123,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
     // Ensure user has access to post in this category
     $canPost = !empty($categories) && (empty($urlParams['streamCategoryID']) || !empty($categories[$urlParams['streamCategoryID']]));
     if ($canPost && isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.php')) {
-        $form = Form::create('block', $gibbon->session->get('absoluteURL').'/modules/Stream/posts_manage_addProcess.php');
+        $form = Form::create('post', $gibbon->session->get('absoluteURL').'/modules/Stream/posts_manage_addProcess.php');
         $form->addHiddenValue('address', $gibbon->session->get('address'));
         $form->addHiddenValue('source', 'stream');
         $form->addHiddenValue('streamCategoryID', $urlParams['streamCategoryID']);
@@ -145,10 +145,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
 
         $row = $form->addRow()->addSubmit(__('Post'));
 
-        $_SESSION[$guid]['sidebarExtra'] .= '<div class="column-no-break">';
-        $_SESSION[$guid]['sidebarExtra'] .= '<h5 class="mt-4 mb-2 text-xs pb-0 ">'.__('New Post').'</h5>';
-        $_SESSION[$guid]['sidebarExtra'] .= $form->getOutput();
-        $_SESSION[$guid]['sidebarExtra'] .= '</div>';
+        $formHTML = '<div class="column-no-break">';
+        $formHTML .= '<h5 class="mt-4 mb-2 text-xs pb-0 ">';
+        $formHTML .= !empty($urlParams['category'])
+            ? __('New Post in {category}', ['category' => $urlParams['category']])
+            : __('New Post');
+        $formHTML .= '</h5>';
+        $formHTML .= $form->getOutput();
+        $formHTML .= '</div>';
+
+        $_SESSION[$guid]['sidebarExtra'] .= $formHTML;
     }
 
     // RECENT TAGS
