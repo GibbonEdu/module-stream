@@ -37,7 +37,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/categories_manage.p
     $categoryGateway = $container->get(categoryGateway::class);
 
     $criteria = $categoryGateway->newQueryCriteria()
-        ->sortBy(['name'])
+        ->sortBy(['sequenceNumber', 'name'])
         ->fromPOST();
 
     $categories = $categoryGateway->queryCategories($criteria);
@@ -53,6 +53,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/categories_manage.p
         if ($category['active'] == 'N') $row->addClass('error');
         return $row;
     });
+
+    $table->addDraggableColumn('streamCategoryID', $gibbon->session->get('absoluteURL').'/modules/Stream/categories_manage_editOrderAjax.php');
 
     $table->addColumn('name', __('Name'))
         ->sortable(['streamCategory.name']);

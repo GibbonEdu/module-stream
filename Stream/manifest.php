@@ -44,6 +44,7 @@ $moduleTables[] = "CREATE TABLE `streamCategory` (
   `streamCategoryID` INT(3) unsigned zerofill NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL DEFAULT '',
   `active` ENUM('Y','N') NOT NULL DEFAULT 'Y',
+  `sequenceNumber` INT(3) NULL,
   `staffAccess` ENUM('None','View','Post') NOT NULL DEFAULT 'None',
   `studentAccess` ENUM('None','View','Post') NOT NULL DEFAULT 'None',
   `parentAccess` ENUM('None','View','Post') NOT NULL DEFAULT 'None',

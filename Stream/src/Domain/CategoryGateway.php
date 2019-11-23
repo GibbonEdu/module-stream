@@ -71,7 +71,8 @@ class CategoryGateway extends QueryableGateway
                 OR (gibbonRole.category = 'Parent' AND (streamCategory.parentAccess='View' OR streamCategory.parentAccess='Post'))
                 OR (gibbonRole.category = 'Other' AND (streamCategory.otherAccess='View' OR streamCategory.otherAccess='Post'))
             )")
-            ->groupBy(['streamCategory.streamCategoryID']);
+            ->groupBy(['streamCategory.streamCategoryID'])
+            ->orderBy(['streamCategory.sequenceNumber', 'streamCategory.name']);
 
         return $this->runSelect($query);
     }
