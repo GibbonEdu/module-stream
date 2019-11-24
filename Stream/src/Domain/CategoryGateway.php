@@ -66,7 +66,7 @@ class CategoryGateway extends QueryableGateway
             ->leftJoin('streamPost', 'FIND_IN_SET(streamCategory.streamCategoryID, streamPost.streamCategoryIDList)')
             ->where('gibbonPerson.gibbonPersonID=:gibbonPersonID')
             ->bindValue('gibbonPersonID', $gibbonPersonID)
-            ->where("((gibbonRole.category = 'Staff' AND (streamCategory.staffAccess='View' OR streamCategory.staffAccess='Post')) 
+            ->where("((gibbonRole.category = 'Staff' AND (streamCategory.staffAccess='View' OR streamCategory.staffAccess='Post'))
                 OR (gibbonRole.category = 'Student' AND (streamCategory.studentAccess='View' OR streamCategory.studentAccess='Post'))
                 OR (gibbonRole.category = 'Parent' AND (streamCategory.parentAccess='View' OR streamCategory.parentAccess='Post'))
                 OR (gibbonRole.category = 'Other' AND (streamCategory.otherAccess='View' OR streamCategory.otherAccess='Post'))
@@ -86,12 +86,13 @@ class CategoryGateway extends QueryableGateway
             ->innerJoin('streamCategory', "streamCategory.active='Y'")
             ->where('gibbonRole.gibbonRoleID=:gibbonRoleID')
             ->bindValue('gibbonRoleID', $gibbonRoleID)
-            ->where("((gibbonRole.category = 'Staff' AND streamCategory.staffAccess='Post') 
+            ->where("((gibbonRole.category = 'Staff' AND streamCategory.staffAccess='Post')
                 OR (gibbonRole.category = 'Student' AND streamCategory.studentAccess='Post')
                 OR (gibbonRole.category = 'Parent' AND streamCategory.parentAccess='Post')
                 OR (gibbonRole.category = 'Other' AND streamCategory.otherAccess='Post')
             )")
-            ->groupBy(['streamCategory.streamCategoryID']);
+            ->groupBy(['streamCategory.streamCategoryID'])
+            ->orderBy(['streamCategory.sequenceNumber', 'streamCategory.name']);
 
         return $this->runSelect($query);
     }
