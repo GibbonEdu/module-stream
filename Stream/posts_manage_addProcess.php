@@ -53,12 +53,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.ph
     // Sanitize the whole $_POST array
     $validator = new Validator();
     $_POST = $validator->sanitize($_POST);
-    
+
     $data = [
         'gibbonSchoolYearID'    => $gibbon->session->get('gibbonSchoolYearID'),
         'gibbonPersonID'        => $gibbon->session->get('gibbonPersonID'),
         'post'                  => $_POST['post'] ?? '',
-        'streamCategoryIDList'  => (!empty($_POST['streamCategoryIDList']) &&(is_array($_POST['streamCategoryIDList'])) ? implode(",", $_POST['streamCategoryIDList']) : $_POST['streamCategoryIDList']),
+        'streamCategoryIDList'  => (!empty($_POST['streamCategoryIDList']) && (is_array($_POST['streamCategoryIDList'])) ? implode(",", $_POST['streamCategoryIDList']) : null),
         'timestamp'             => date('Y-m-d H:i:s'),
     ];
 
