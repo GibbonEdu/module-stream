@@ -1,9 +1,14 @@
 CHANGELOG
 =========
 
+v1.0.00
+-------
+View Stream
+Manage Posts
+
 v0.1.00
 -------
 Action definitions
 Data structure definitions
 Stream Settings
-Manage categories
+Manage Categories
