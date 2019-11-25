@@ -58,9 +58,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.ph
         'gibbonSchoolYearID'    => $gibbon->session->get('gibbonSchoolYearID'),
         'gibbonPersonID'        => $gibbon->session->get('gibbonPersonID'),
         'post'                  => $_POST['post'] ?? '',
-        'streamCategoryIDList'  => (!empty($_POST['streamCategoryIDList']) && (is_array($_POST['streamCategoryIDList'])) ? implode(",", $_POST['streamCategoryIDList']) : null),
+        'streamCategoryIDList'  => $_POST['streamCategoryIDList'] ?? null,
         'timestamp'             => date('Y-m-d H:i:s'),
     ];
+
+    $data['streamCategoryIDList'] = is_array($data['streamCategoryIDList'])
+        ? implode(',', $data['streamCategoryIDList']) 
+        : $data['streamCategoryIDList'];
 
     // Validate the required values are present
     if (empty($data['post'])) {
