@@ -32,7 +32,7 @@ For info about editing, see: https://twig.symfony.com/doc/2.x/
 {% endif %}
 
 {% if stream %}
-    <div id="stream" class="rounded-b border-l border-r overflow-hidden">
+    <div id="stream" class="overflow-hidden rounded-b border-l border-r {{ categories is empty ? 'rounded-t border-t' }}">
     {% include 'streamPosts.twig.html' %}
     </div>
 

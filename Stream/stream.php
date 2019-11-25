@@ -29,6 +29,7 @@ use Gibbon\Module\Stream\Domain\CategoryViewedGateway;
 if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == false) {
     // Access denied
     $page->addError(__('You do not have access to this action.'));
+    return;
 } else {
     // Proceed!
     $urlParams = [
@@ -121,7 +122,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
 
     // NEW POST
     // Ensure user has access to post in this category
-    $canPost = !empty($categories) && (empty($urlParams['streamCategoryID']) || !empty($categories[$urlParams['streamCategoryID']]));
+    $canPost = empty($urlParams['streamCategoryID']) || !empty($categories[$urlParams['streamCategoryID']]);
     if ($canPost && isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.php')) {
         $form = Form::create('post', $gibbon->session->get('absoluteURL').'/modules/Stream/posts_manage_addProcess.php');
         $form->addHiddenValue('address', $gibbon->session->get('address'));

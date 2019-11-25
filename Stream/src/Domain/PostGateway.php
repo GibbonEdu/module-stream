@@ -55,7 +55,7 @@ class PostGateway extends QueryableGateway
         }
 
         if (!empty($gibbonRoleID)) {
-            $query->innerJoin('gibbonRole', "( (streamPost.streamCategoryIDList IS NULL OR streamPost.streamCategoryIDList = '')
+            $query->innerJoin('gibbonRole', "( (streamCategory.streamCategoryID IS NULL OR streamPost.streamCategoryIDList = '')
                     OR (gibbonRole.category = 'Staff' AND (streamCategory.staffAccess='View' OR streamCategory.staffAccess='Post')) 
                     OR (gibbonRole.category = 'Student' AND (streamCategory.studentAccess='View' OR streamCategory.studentAccess='Post'))
                     OR (gibbonRole.category = 'Parent' AND (streamCategory.parentAccess='View' OR streamCategory.parentAccess='Post'))
