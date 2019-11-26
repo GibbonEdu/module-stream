@@ -108,8 +108,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
         }, $item['post']);
 
         // Auto-link hashtags
-        $item['post'] = preg_replace_callback('/\s+([#]+)([\w]+)(\s|$)+/iu', function ($matches) {
-            return ' '.Format::link('./index.php?q=/modules/Stream/stream.php&tag=' . $matches[2], $matches[1] . $matches[2]).' ';
+        $item['post'] = preg_replace_callback('/(\s|^)+([#]+)([\w]+)(\s|$)+/iu', function ($matches) {
+            return ' '.Format::link('./index.php?q=/modules/Stream/stream.php&tag=' . $matches[3], $matches[2] . $matches[3]).' ';
         }, $item['post']);
 
         return $item;
