@@ -99,10 +99,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
         $updated = $categoryViewedGateway->insertAndUpdate($data, ['timestamp' => date('Y-m-d H:i:s')]);
     }
 
-    // Auto-link hashtags
+    
     $streamData = array_map(function ($item) {
-        $item['post'] = preg_replace_callback('/([#]+)([\w]+)/iu', function ($matches) {
-            return Format::link('./index.php?q=/modules/Stream/stream.php&tag=' . $matches[2], $matches[1] . $matches[2]);
+        // Auto-link urls
+        $item['post'] = preg_replace_callback('/(https?:\/\/[^\s\$.?#].[^\s]*)(\s|$)+/iu', function ($matches) {
+            $linktext = strlen($matches[1]) > 45 ? substr($matches[1], 0, 45).'…' : $matches[1];
+            return Format::link($matches[1], $linktext).' ';
+        }, $item['post']);
+
+        // Auto-link hashtags
+        $item['post'] = preg_replace_callback('/\s+([#]+)([\w]+)(\s|$)+/iu', function ($matches) {
+            return ' '.Format::link('./index.php?q=/modules/Stream/stream.php&tag=' . $matches[2], $matches[1] . $matches[2]).' ';
         }, $item['post']);
 
         return $item;
