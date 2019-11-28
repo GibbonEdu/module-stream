@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+v1.0.01
+-------
+Added automatic link highlighting
+
 v1.0.00
 -------
 View Stream
