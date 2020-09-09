@@ -71,7 +71,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
         ->fromPOST();
 
     // Get the stream, join a set of attachment data per post
-    $stream = $postGateway->queryPostsBySchoolYear($criteria, $gibbonSchoolYearID, null, $gibbon->session->get('gibbonRoleIDCurrent'));
+    $showPreviousYear = $container->get(SettingGateway::class)->getSettingByScope('Stream', 'showPreviousYear');
+    $stream = $postGateway->queryPostsBySchoolYear($criteria, $gibbonSchoolYearID, $showPreviousYear, null, $gibbon->session->get('gibbonRoleIDCurrent'));
     $streamPosts = $stream->getColumn('streamPostID');
     $attachments = $container->get(PostAttachmentGateway::class)->selectAttachmentsByPost($streamPosts)->fetchGrouped();
     $stream->joinColumn('streamPostID', 'attachments', $attachments);
@@ -99,7 +100,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
         $updated = $categoryViewedGateway->insertAndUpdate($data, ['timestamp' => date('Y-m-d H:i:s')]);
     }
 
-    
+
     $streamData = array_map(function ($item) {
         // Auto-link urls
         $item['post'] = preg_replace_callback('/(https?:\/\/[^\s\$.?#].[^\s]*)(\s|$)+/iu', function ($matches) {
@@ -179,7 +180,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
 
         $('#loadPosts').click(function() {
             pageNum++;
-            
+
             $.ajax({
                 url: "<?php echo $gibbon->session->get('absoluteURL'); ?>/modules/Stream/streamAjax.php",
                 data: {
@@ -198,7 +199,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
                 },
             });
         });
-        
+
         $('.image-container').magnificPopup({
             type: 'image',
             delegate: 'a',

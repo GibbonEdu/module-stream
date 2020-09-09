@@ -30,12 +30,12 @@ class PostGateway extends QueryableGateway
     private static $tableName = 'streamPost';
     private static $primaryKey = 'streamPostID';
     private static $searchableColumns = [''];
-    
+
     /**
      * @param QueryCriteria $criteria
      * @return DataSet
      */
-    public function queryPostsBySchoolYear(QueryCriteria $criteria, $gibbonSchoolYearID, $gibbonPersonID = null, $gibbonRoleID = null)
+    public function queryPostsBySchoolYear(QueryCriteria $criteria, $gibbonSchoolYearID, $showPreviousYear = "N", $gibbonPersonID = null, $gibbonRoleID = null)
     {
         $query = $this
             ->newQuery()
@@ -43,11 +43,20 @@ class PostGateway extends QueryableGateway
             ->from($this->getTableName())
             ->cols(['streamPost.streamPostID', 'streamPost.post', 'streamPost.timestamp', 'gibbonPerson.title', 'gibbonPerson.preferredName', 'gibbonPerson.surname', 'gibbonPerson.username', 'gibbonPerson.image_240'])
             ->innerJoin('gibbonPerson', 'gibbonPerson.gibbonPersonID=streamPost.gibbonPersonID')
+            ->innerJoin('gibbonSchoolYear', 'streamPost.gibbonSchoolYearID=gibbonSchoolYear.gibbonSchoolYearID')
             ->leftJoin('streamPostTag', 'streamPostTag.streamPostID=streamPost.streamPostID')
             ->leftJoin('streamCategory', 'FIND_IN_SET(streamCategory.streamCategoryID, streamPost.streamCategoryIDList)')
-            ->where('streamPost.gibbonSchoolYearID=:gibbonSchoolYearID')
-            ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID)
             ->groupBy(['streamPost.streamPostID']);
+
+        if ($showPreviousYear == "Y") {
+            $query->where('streamPost.gibbonSchoolYearID=:gibbonSchoolYearID OR streamPost.gibbonSchoolYearID=(SELECT gibbonSchoolYearID FROM gibbonSchoolYear WHERE sequenceNumber<(SELECT sequenceNumber FROM gibbonSchoolYear WHERE gibbonSchoolYearID=:gibbonSchoolYearID) ORDER BY sequenceNumber DESC LIMIT 0,1)')
+                ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID);
+        }
+        else {
+            $query->where('streamPost.gibbonSchoolYearID=:gibbonSchoolYearID')
+                ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID);
+        }
+
 
         if (!empty($gibbonPersonID)) {
             $query->where('streamPost.gibbonPersonID=:gibbonPersonID')
@@ -56,7 +65,7 @@ class PostGateway extends QueryableGateway
 
         if (!empty($gibbonRoleID)) {
             $query->innerJoin('gibbonRole', "( (streamCategory.streamCategoryID IS NULL OR streamPost.streamCategoryIDList = '')
-                    OR (gibbonRole.category = 'Staff' AND (streamCategory.staffAccess='View' OR streamCategory.staffAccess='Post')) 
+                    OR (gibbonRole.category = 'Staff' AND (streamCategory.staffAccess='View' OR streamCategory.staffAccess='Post'))
                     OR (gibbonRole.category = 'Student' AND (streamCategory.studentAccess='View' OR streamCategory.studentAccess='Post'))
                     OR (gibbonRole.category = 'Parent' AND (streamCategory.parentAccess='View' OR streamCategory.parentAccess='Post'))
                     OR (gibbonRole.category = 'Other' AND (streamCategory.otherAccess='View' OR streamCategory.otherAccess='Post'))

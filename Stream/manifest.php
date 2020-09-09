@@ -25,7 +25,7 @@ $description = 'Stream is a photo sharing and social module, which allows users 
 $entryURL = 'stream.php';
 $type = 'Additional';
 $category = 'Other';
-$version = '1.0.02';
+$version = '1.0.03';
 $author = 'Sanda Kuipers, Harry Merrett & Ross Parker';
 $url = 'https://gibbonedu.org';
 
@@ -84,6 +84,7 @@ $moduleTables[] = "CREATE TABLE `streamPostAttachment` (
 //Settings
 $gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Stream', 'postLength', 'Post Length', 'Maximum number of characters in a post.', '280');";
 $gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Stream', 'maxImageSize', 'Max Image Size', 'Maximum image size in pixels. Larger images will be scaled down.', '1400');";
+$gibbonSetting[] = "INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Stream', 'showPreviousYear', 'Show Previous Year', 'Should posts from the immediately previous year be displayed in Stream?', 'N');";
 
 //Action rows
 $actionRows[] = [

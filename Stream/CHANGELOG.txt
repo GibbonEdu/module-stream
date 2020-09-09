@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v1.0.03
+-------
+Added setting to include previous year in Stream view
+
 v1.0.02
 -------
 Tweaked sidebar tag style

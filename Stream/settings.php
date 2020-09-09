@@ -49,6 +49,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/settings.php') == f
         $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
         $row->addNumber($setting['name'])->required()->setValue($setting['value'])->minimum(1024)->maximum(4096);
 
+    $setting = $settingGateway->getSettingByScope('Stream', 'showPreviousYear', true);
+    $row = $form->addRow();
+        $row->addLabel($setting['name'], __m($setting['nameDisplay']))->description(__m($setting['description']));
+        $row->addYesNo($setting['name'])->required()->selected($setting['value']);
+
     $row = $form->addRow();
         $row->addFooter();
         $row->addSubmit();

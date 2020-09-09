@@ -57,7 +57,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
         ->fromPOST();
 
     // Get the stream, join a set of attachment data per post
-    $stream = $postGateway->queryPostsBySchoolYear($criteria, $gibbonSchoolYearID, null, $gibbon->session->get('gibbonRoleIDCurrent'));
+    $showPreviousYear = $container->get(SettingGateway::class)->getSettingByScope('Stream', 'showPreviousYear');
+    $stream = $postGateway->queryPostsBySchoolYear($criteria, $gibbonSchoolYearID, $showPreviousYear, null, $gibbon->session->get('gibbonRoleIDCurrent'));
     $streamPosts = $stream->getColumn('streamPostID');
     $attachments = $container->get(PostAttachmentGateway::class)->selectAttachmentsByPost($streamPosts)->fetchGrouped();
     $stream->joinColumn('streamPostID', 'attachments', $attachments);
