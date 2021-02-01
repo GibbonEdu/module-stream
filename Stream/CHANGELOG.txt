@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v1.0.04
+-------
+Fixed categories when using Show Previous Year option
+
 v1.0.03
 -------
 Added setting to include previous year in Stream view

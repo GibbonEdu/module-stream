@@ -25,7 +25,7 @@ $description = 'Stream is a photo sharing and social module, which allows users 
 $entryURL = 'stream.php';
 $type = 'Additional';
 $category = 'Other';
-$version = '1.0.03';
+$version = '1.0.04';
 $author = 'Sanda Kuipers, Harry Merrett & Ross Parker';
 $url = 'https://gibbonedu.org';
 

@@ -139,7 +139,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
 
         $postLength = $container->get(SettingGateway::class)->getSettingByScope('Stream', 'postLength');
         $col = $form->addRow()->addColumn();
-            $col->addTextArea('post')->required()->setRows(6)->addClass('font-sans text-sm')->maxLength($postLength);
+            $col->addTextArea('post')->setID('newPost')->required()->setRows(6)->addClass('font-sans text-sm')->maxLength($postLength);
 
         $row = $form->addRow()->addDetails()->summary(__('Add Photos'));
             $row->addFileUpload('attachments')->accepts('.jpg,.jpeg,.gif,.png')->uploadMultiple(true);

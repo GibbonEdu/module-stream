@@ -49,14 +49,13 @@ class PostGateway extends QueryableGateway
             ->groupBy(['streamPost.streamPostID']);
 
         if ($showPreviousYear == "Y") {
-            $query->where('streamPost.gibbonSchoolYearID=:gibbonSchoolYearID OR streamPost.gibbonSchoolYearID=(SELECT gibbonSchoolYearID FROM gibbonSchoolYear WHERE sequenceNumber<(SELECT sequenceNumber FROM gibbonSchoolYear WHERE gibbonSchoolYearID=:gibbonSchoolYearID) ORDER BY sequenceNumber DESC LIMIT 0,1)')
+            $query->where('(streamPost.gibbonSchoolYearID=:gibbonSchoolYearID OR streamPost.gibbonSchoolYearID=(SELECT gibbonSchoolYearID FROM gibbonSchoolYear WHERE sequenceNumber<(SELECT sequenceNumber FROM gibbonSchoolYear WHERE gibbonSchoolYearID=:gibbonSchoolYearID) ORDER BY sequenceNumber DESC LIMIT 0,1))')
                 ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID);
         }
         else {
             $query->where('streamPost.gibbonSchoolYearID=:gibbonSchoolYearID')
                 ->bindValue('gibbonSchoolYearID', $gibbonSchoolYearID);
         }
-
 
         if (!empty($gibbonPersonID)) {
             $query->where('streamPost.gibbonPersonID=:gibbonPersonID')

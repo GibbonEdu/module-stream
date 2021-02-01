@@ -23,5 +23,10 @@ $sql[$count][1] = '';
 //v1.0.03
 $sql[$count][0] = '1.0.03';
 $sql[$count][1] = "
-INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Stream', 'showPreviousYear', 'Show Previous Year', 'Should posts from the immediately previous year be displayed in Stream?', 'N');
+INSERT INTO `gibbonSetting` (`gibbonSettingID` ,`scope` ,`name` ,`nameDisplay` ,`description` ,`value`) VALUES (NULL , 'Stream', 'showPreviousYear', 'Show Previous Year', 'Should posts from the immediately previous year be displayed in Stream?', 'N');end
+";
+
+//v1.0.04
+$sql[$count][0] = '1.0.04';
+$sql[$count][1] = "
 ";
