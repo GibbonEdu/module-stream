@@ -54,10 +54,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_edit.p
         return;
     }
 
-    $form = Form::create('post', $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module').'/posts_manage_editProcess.php');
+    $form = Form::create('post', $session->get('absoluteURL').'/modules/'.$session->get('module').'/posts_manage_editProcess.php');
     $form->setFactory(DatabaseFormFactory::create($pdo));
 
-    $form->addHiddenValue('address', $gibbon->session->get('address'));
+    $form->addHiddenValue('address', $session->get('address'));
     $form->addHiddenValue('streamPostID', $streamPostID);
 
     $postLength = $container->get(SettingGateway::class)->getSettingByScope('Stream', 'postLength');
@@ -66,7 +66,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_edit.p
         $col->addTextArea('post')->required()->setRows(6)->addClass('font-sans text-sm')->maxLength($postLength);
 
     // ATTACHMENTS
-    $absoluteURL = $gibbon->session->get('absoluteURL');
+    $absoluteURL = $session->get('absoluteURL');
     $attachments = $container->get(PostAttachmentGateway::class)->selectAttachmentsByPost($streamPostID)->fetchAll();
 
     if (!empty($attachments)) {
@@ -101,7 +101,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_edit.p
 
     // CATEGORIES
     $categoryGateway = $container->get(CategoryGateway::class);
-    $categories = $categoryGateway->selectPostableCategoriesByRole($gibbon->session->get('gibbonRoleIDCurrent'))->fetchKeyPair();
+    $categories = $categoryGateway->selectPostableCategoriesByRole($session->get('gibbonRoleIDCurrent'))->fetchKeyPair();
 
     if (!empty($categories)) {
         $values['streamCategoryIDList'] = explode(',', $values['streamCategoryIDList']);

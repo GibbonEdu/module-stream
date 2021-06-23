@@ -31,16 +31,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/categories_manage_a
 
     $editLink = '';
     if (isset($_GET['editID'])) {
-        $editLink = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Stream/categories_manage_edit.php&streamCategoryID='.$_GET['editID'];
+        $editLink = $session->get('absoluteURL').'/index.php?q=/modules/Stream/categories_manage_edit.php&streamCategoryID='.$_GET['editID'];
     }
     if (isset($_GET['return'])) {
         returnProcess($guid, $_GET['return'], $editLink, null);
     }
 
-    $form = Form::create('category', $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module').'/categories_manage_addProcess.php');
+    $form = Form::create('category', $session->get('absoluteURL').'/modules/'.$session->get('module').'/categories_manage_addProcess.php');
     $form->setFactory(DatabaseFormFactory::create($pdo));
 
-    $form->addHiddenValue('address', $gibbon->session->get('address'));
+    $form->addHiddenValue('address', $session->get('address'));
 
     $row = $form->addRow();
         $row->addLabel('name', __('Name'))->description(__('Must be unique.'));

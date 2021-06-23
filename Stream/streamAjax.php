@@ -47,7 +47,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
     // QUERY
     $postGateway = $container->get(PostGateway::class);
     $categoryGateway = $container->get(CategoryGateway::class);
-    $gibbonSchoolYearID = $gibbon->session->get('gibbonSchoolYearID');
+    $gibbonSchoolYearID = $session->get('gibbonSchoolYearID');
 
     $criteria = $postGateway->newQueryCriteria(true)
         ->sortBy(['timestamp'], 'DESC')
@@ -58,13 +58,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
 
     // Get the stream, join a set of attachment data per post
     $showPreviousYear = $container->get(SettingGateway::class)->getSettingByScope('Stream', 'showPreviousYear');
-    $stream = $postGateway->queryPostsBySchoolYear($criteria, $gibbonSchoolYearID, $showPreviousYear, null, $gibbon->session->get('gibbonRoleIDCurrent'));
+    $stream = $postGateway->queryPostsBySchoolYear($criteria, $gibbonSchoolYearID, $showPreviousYear, null, $session->get('gibbonRoleIDCurrent'));
     $streamPosts = $stream->getColumn('streamPostID');
     $attachments = $container->get(PostAttachmentGateway::class)->selectAttachmentsByPost($streamPosts)->fetchGrouped();
     $stream->joinColumn('streamPostID', 'attachments', $attachments);
 
     // Get viewable categories
-    $categories = $categoryGateway->selectViewableCategoriesByPerson($gibbon->session->get('gibbonPersonID'))->fetchGroupedUnique();
+    $categories = $categoryGateway->selectViewableCategoriesByPerson($session->get('gibbonPersonID'))->fetchGroupedUnique();
     if (!empty($urlParams['streamCategoryID']) && empty($categories[$urlParams['streamCategoryID']])) {
         echo Format::alert(__('You do not have access to this action.'));
         return;

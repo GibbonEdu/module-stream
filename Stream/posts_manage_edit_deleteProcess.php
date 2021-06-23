@@ -27,7 +27,7 @@ require_once '../../gibbon.php';
 
 $streamPostID = $_GET['streamPostID'] ?? '';
 $streamPostAttachmentID = $_GET['streamPostAttachmentID'] ?? '';
-$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Stream/posts_manage_edit.php&streamPostID='.$streamPostID;
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/Stream/posts_manage_edit.php&streamPostID='.$streamPostID;
 
 if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_edit.php') == false) {
     $URL .= '&return=error0';
@@ -36,7 +36,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_edit.p
 } else {
     // Proceed!
     $postAttachmentGateway = $container->get(PostAttachmentGateway::class);
-    $absolutePath = $gibbon->session->get('absolutePath');
+    $absolutePath = $session->get('absolutePath');
     $partialFail = false;
   
     // Validate the required values are present

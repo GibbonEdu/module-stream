@@ -38,7 +38,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage.php') 
     if ($highestAction == 'Manage Posts_all') {
         $gibbonPersonID = $_GET['gibbonPersonID'] ?? null;
     } elseif ($highestAction == 'Manage Posts_my') {
-        $gibbonPersonID = $gibbon->session->get('gibbonPersonID');
+        $gibbonPersonID = $session->get('gibbonPersonID');
     } else {
         $page->addError(__('You do not have access to this action.'));
         return;
@@ -50,7 +50,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage.php') 
 
     // Query posts
     $postGateway = $container->get(PostGateway::class);
-    $gibbonSchoolYearID = $gibbon->session->get('gibbonSchoolYearID');
+    $gibbonSchoolYearID = $session->get('gibbonSchoolYearID');
 
     $criteria = $postGateway->newQueryCriteria(true)
         ->sortBy('timestamp', 'DESC')

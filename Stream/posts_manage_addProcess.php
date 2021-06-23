@@ -34,8 +34,8 @@ $source = $_POST['source'] ?? '';
 $category = $_POST['category'] ?? '';
 $streamCategoryID = $_POST['streamCategoryID'] ?? '';
 $URL = $source == 'stream'
-    ? $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Stream/stream.php&category='.$category.'&streamCategoryID='.$streamCategoryID
-    : $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Stream/posts_manage_add.php';
+    ? $session->get('absoluteURL').'/index.php?q=/modules/Stream/stream.php&category='.$category.'&streamCategoryID='.$streamCategoryID
+    : $session->get('absoluteURL').'/index.php?q=/modules/Stream/posts_manage_add.php';
 
 if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.php') == false) {
     $URL .= '&return=error0';
@@ -55,8 +55,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.ph
     $_POST = $validator->sanitize($_POST);
 
     $data = [
-        'gibbonSchoolYearID'    => $gibbon->session->get('gibbonSchoolYearID'),
-        'gibbonPersonID'        => $gibbon->session->get('gibbonPersonID'),
+        'gibbonSchoolYearID'    => $session->get('gibbonSchoolYearID'),
+        'gibbonPersonID'        => $session->get('gibbonPersonID'),
         'post'                  => $_POST['post'] ?? '',
         'streamCategoryIDList'  => $_POST['streamCategoryIDList'] ?? null,
         'timestamp'             => date('Y-m-d H:i:s'),
@@ -91,8 +91,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.ph
 
     // Handle file upload for multiple attachments, including resizing images & generating thumbnails
     if (!empty($_FILES['attachments']['tmp_name'][0])) {
-        $fileUploader = new FileUploader($pdo, $gibbon->session);
-        $absolutePath = $gibbon->session->get('absolutePath');
+        $fileUploader = new FileUploader($pdo, $session);
+        $absolutePath = $session->get('absolutePath');
         $maxImageSize = $container->get(SettingGateway::class)->getSettingByScope('Stream', 'maxImageSize');
 
         foreach ($_FILES['attachments']['name'] as $index => $name) {

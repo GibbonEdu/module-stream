@@ -23,7 +23,7 @@ require_once '../../gibbon.php';
 
 $streamPostID = $_POST['streamPostID'] ?? '';
 
-$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Stream/posts_manage.php';
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/Stream/posts_manage.php';
 
 if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_delete.php') == false) {
     $URL .= '&return=error0';
