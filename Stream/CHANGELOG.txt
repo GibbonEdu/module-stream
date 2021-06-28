@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v1.0.05
+-------
+Refactored session variables
+
 v1.0.04
 -------
 Fixed categories when using Show Previous Year option

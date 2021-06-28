@@ -39,6 +39,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/categories_manage_d
         return;
     }
 
-    $form = DeleteForm::createForm($gibbon->session->get('absoluteURL').'/modules/Stream/categories_manage_deleteProcess.php');
+    $form = DeleteForm::createForm($session->get('absoluteURL').'/modules/Stream/categories_manage_deleteProcess.php');
     echo $form->getOutput();
 }

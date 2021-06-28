@@ -61,7 +61,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
     $postGateway = $container->get(PostGateway::class);
     $categoryGateway = $container->get(CategoryGateway::class);
     $categoryViewedGateway = $container->get(CategoryViewedGateway::class);
-    $gibbonSchoolYearID = $gibbon->session->get('gibbonSchoolYearID');
+    $gibbonSchoolYearID = $session->get('gibbonSchoolYearID');
 
     $criteria = $postGateway->newQueryCriteria(true)
         ->sortBy(['timestamp'], 'DESC')
@@ -72,13 +72,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
 
     // Get the stream, join a set of attachment data per post
     $showPreviousYear = $container->get(SettingGateway::class)->getSettingByScope('Stream', 'showPreviousYear');
-    $stream = $postGateway->queryPostsBySchoolYear($criteria, $gibbonSchoolYearID, $showPreviousYear, null, $gibbon->session->get('gibbonRoleIDCurrent'));
+    $stream = $postGateway->queryPostsBySchoolYear($criteria, $gibbonSchoolYearID, $showPreviousYear, null, $session->get('gibbonRoleIDCurrent'));
     $streamPosts = $stream->getColumn('streamPostID');
     $attachments = $container->get(PostAttachmentGateway::class)->selectAttachmentsByPost($streamPosts)->fetchGrouped();
     $stream->joinColumn('streamPostID', 'attachments', $attachments);
 
     // Get viewable categories
-    $categories = $categoryGateway->selectViewableCategoriesByPerson($gibbon->session->get('gibbonPersonID'))->fetchGroupedUnique();
+    $categories = $categoryGateway->selectViewableCategoriesByPerson($session->get('gibbonPersonID'))->fetchGroupedUnique();
     if (!empty($categories)) {
         $categories = array_merge([0 => ['name' => __('All'), 'streamCategoryID' => 0]], $categories);
     }
@@ -93,7 +93,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
     // Update current category timestamp
     if (!empty($currentCategory)) {
         $data = [
-            'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'),
+            'gibbonPersonID' => $session->get('gibbonPersonID'),
             'streamCategoryID' => $currentCategory['streamCategoryID'],
             'timestamp' => date('Y-m-d H:i:s'),
         ];
@@ -126,14 +126,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
     ]);
 
     $categoryGateway = $container->get(CategoryGateway::class);
-    $categories = $categoryGateway->selectPostableCategoriesByRole($gibbon->session->get('gibbonRoleIDCurrent'))->fetchKeyPair();
+    $categories = $categoryGateway->selectPostableCategoriesByRole($session->get('gibbonRoleIDCurrent'))->fetchKeyPair();
+
+    $sidebarExtra = '';
 
     // NEW POST
     // Ensure user has access to post in this category
     $canPost = empty($urlParams['streamCategoryID']) || !empty($categories[$urlParams['streamCategoryID']]);
     if ($canPost && isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.php')) {
-        $form = Form::create('post', $gibbon->session->get('absoluteURL').'/modules/Stream/posts_manage_addProcess.php');
-        $form->addHiddenValue('address', $gibbon->session->get('address'));
+        $form = Form::create('post', $session->get('absoluteURL').'/modules/Stream/posts_manage_addProcess.php');
+        $form->addHiddenValue('address', $session->get('address'));
         $form->addHiddenValue('source', 'stream');
         $form->addHiddenValue('streamCategoryID', $urlParams['streamCategoryID']);
 
@@ -163,14 +165,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
         $formHTML .= $form->getOutput();
         $formHTML .= '</div>';
 
-        $_SESSION[$guid]['sidebarExtra'] .= $formHTML;
+        $sidebarExtra .= $formHTML;
     }
 
     // RECENT TAGS
     $tags = $container->get(PostTagGateway::class)->selectRecentTagsBySchoolYear($gibbonSchoolYearID)->fetchAll(\PDO::FETCH_COLUMN, 0);
-    $_SESSION[$guid]['sidebarExtra'] .= $page->fetchFromTemplate('tags.twig.html', [
+    $sidebarExtra .= $page->fetchFromTemplate('tags.twig.html', [
         'tags' => $tags,
     ]);
+
+    $session->set('sidebarExtra', $sidebarExtra);
 }
 ?>
 <script>
@@ -182,7 +186,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
             pageNum++;
 
             $.ajax({
-                url: "<?php echo $gibbon->session->get('absoluteURL'); ?>/modules/Stream/streamAjax.php",
+                url: "<?php echo $session->get('absoluteURL'); ?>/modules/Stream/streamAjax.php",
                 data: {
                     streamCategoryID: '<?php echo $urlParams['streamCategoryID']; ?>',
                     page: pageNum,

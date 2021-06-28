@@ -54,7 +54,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/categories_manage.p
         return $row;
     });
 
-    $table->addDraggableColumn('streamCategoryID', $gibbon->session->get('absoluteURL').'/modules/Stream/categories_manage_editOrderAjax.php');
+    $table->addDraggableColumn('streamCategoryID', $session->get('absoluteURL').'/modules/Stream/categories_manage_editOrderAjax.php');
 
     $table->addColumn('name', __('Name'))
         ->sortable(['streamCategory.name']);

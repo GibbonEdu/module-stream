@@ -33,16 +33,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.ph
 
     $editLink = '';
     if (isset($_GET['editID'])) {
-        $editLink = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Stream/posts_manage_edit.php&streamPostID='.$_GET['editID'];
+        $editLink = $session->get('absoluteURL').'/index.php?q=/modules/Stream/posts_manage_edit.php&streamPostID='.$_GET['editID'];
     }
     if (isset($_GET['return'])) {
         returnProcess($guid, $_GET['return'], $editLink, null);
     }
 
-    $form = Form::create('post', $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module').'/posts_manage_addProcess.php');
+    $form = Form::create('post', $session->get('absoluteURL').'/modules/'.$session->get('module').'/posts_manage_addProcess.php');
     $form->setFactory(DatabaseFormFactory::create($pdo));
 
-    $form->addHiddenValue('address', $gibbon->session->get('address'));
+    $form->addHiddenValue('address', $session->get('address'));
 
     $postLength = $container->get(SettingGateway::class)->getSettingByScope('Stream', 'postLength');
     $col = $form->addRow()->addColumn();
@@ -55,7 +55,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.ph
 
     //Categories
     $categoryGateway = $container->get(CategoryGateway::class);
-    $categories = $categoryGateway->selectPostableCategoriesByRole($gibbon->session->get('gibbonRoleIDCurrent'))->fetchKeyPair();
+    $categories = $categoryGateway->selectPostableCategoriesByRole($session->get('gibbonRoleIDCurrent'))->fetchKeyPair();
 
     if (!empty($categories)) {
         $row = $form->addRow();

@@ -28,7 +28,7 @@ require_once '../../gibbon.php';
 
 $streamPostID = $_POST['streamPostID'] ?? '';
 
-$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Stream/posts_manage_edit.php&streamPostID='.$streamPostID;
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/Stream/posts_manage_edit.php&streamPostID='.$streamPostID;
 
 if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_edit.php') == false) {
     $URL .= '&return=error0';
@@ -85,8 +85,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_edit.p
 
     // Handle file upload for multiple attachments, including resizing images & generating thumbnails
     if (!empty($_FILES['attachments']['tmp_name'][0])) {
-        $fileUploader = new FileUploader($pdo, $gibbon->session);
-        $absolutePath = $gibbon->session->get('absolutePath');
+        $fileUploader = new FileUploader($pdo, $session);
+        $absolutePath = $session->get('absolutePath');
         $maxImageSize = $container->get(SettingGateway::class)->getSettingByScope('Stream', 'maxImageSize');
 
         foreach ($_FILES['attachments']['name'] as $index => $name) {

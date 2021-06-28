@@ -24,7 +24,7 @@ require_once '../../gibbon.php';
 
 $streamCategoryID = $_POST['streamCategoryID'] ?? '';
 
-$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Stream/categories_manage_edit.php&streamCategoryID='.$streamCategoryID;
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/Stream/categories_manage_edit.php&streamCategoryID='.$streamCategoryID;
 
 if (isActionAccessible($guid, $connection2, '/modules/Stream/categories_manage_edit.php') == false) {
     $URL .= '&return=error0';
