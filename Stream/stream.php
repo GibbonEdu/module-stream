@@ -53,10 +53,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
         ]));
     }
 
-    if (isset($_GET['return'])) {
-        returnProcess($guid, $_GET['return'], null, null);
-    }
-
     // QUERY
     $postGateway = $container->get(PostGateway::class);
     $categoryGateway = $container->get(CategoryGateway::class);

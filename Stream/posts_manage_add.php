@@ -35,9 +35,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.ph
     if (isset($_GET['editID'])) {
         $editLink = $session->get('absoluteURL').'/index.php?q=/modules/Stream/posts_manage_edit.php&streamPostID='.$_GET['editID'];
     }
-    if (isset($_GET['return'])) {
-        returnProcess($guid, $_GET['return'], $editLink, null);
-    }
+    $page->return->setEditLink($editLink);
 
     $form = Form::create('post', $session->get('absoluteURL').'/modules/'.$session->get('module').'/posts_manage_addProcess.php');
     $form->setFactory(DatabaseFormFactory::create($pdo));

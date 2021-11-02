@@ -51,7 +51,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.ph
     $partialFail = false;
 
     // Sanitize the whole $_POST array
-    $validator = new Validator();
+    $validator = new Validator($session);
     $_POST = $validator->sanitize($_POST);
 
     $data = [
@@ -63,7 +63,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.ph
     ];
 
     $data['streamCategoryIDList'] = is_array($data['streamCategoryIDList'])
-        ? implode(',', $data['streamCategoryIDList']) 
+        ? implode(',', $data['streamCategoryIDList'])
         : $data['streamCategoryIDList'];
 
     // Validate the required values are present

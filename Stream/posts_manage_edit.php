@@ -38,10 +38,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_edit.p
         ->add(__m('Manage Posts'), 'posts_manage.php')
         ->add(__m('Edit Post'));
 
-    if (isset($_GET['return'])) {
-        returnProcess($guid, $_GET['return'], null, null);
-    }
-
     if (empty($streamPostID)) {
         $page->addError(__('You have not specified one or more required parameters.'));
         return;

@@ -32,10 +32,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/categories_manage_e
         ->add(__m('Manage Categories'), 'categories_manage.php')
         ->add(__m('Edit Category'));
 
-    if (isset($_GET['return'])) {
-        returnProcess($guid, $_GET['return'], null, null);
-    }
-
     if (empty($streamCategoryID)) {
         $page->addError(__('You have not specified one or more required parameters.'));
         return;

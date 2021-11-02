@@ -44,10 +44,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage.php') 
         return;
     }
 
-    if (isset($_GET['return'])) {
-        returnProcess($guid, $_GET['return'], null, null);
-    }
-
     // Query posts
     $postGateway = $container->get(PostGateway::class);
     $gibbonSchoolYearID = $session->get('gibbonSchoolYearID');

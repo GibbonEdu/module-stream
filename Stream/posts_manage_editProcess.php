@@ -43,7 +43,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_edit.p
     $partialFail = false;
 
     // Sanitize the whole $_POST array
-    $validator = new Validator();
+    $validator = new Validator($session);
     $_POST = $validator->sanitize($_POST);
 
     $data = [

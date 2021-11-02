@@ -33,9 +33,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/categories_manage_a
     if (isset($_GET['editID'])) {
         $editLink = $session->get('absoluteURL').'/index.php?q=/modules/Stream/categories_manage_edit.php&streamCategoryID='.$_GET['editID'];
     }
-    if (isset($_GET['return'])) {
-        returnProcess($guid, $_GET['return'], $editLink, null);
-    }
+    $page->return->setEditLink($editLink);
 
     $form = Form::create('category', $session->get('absoluteURL').'/modules/'.$session->get('module').'/categories_manage_addProcess.php');
     $form->setFactory(DatabaseFormFactory::create($pdo));
