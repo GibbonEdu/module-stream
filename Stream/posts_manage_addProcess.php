@@ -51,8 +51,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.ph
     $partialFail = false;
 
     // Sanitize the whole $_POST array
-    $validator = new Validator($session);
-    $_POST = $validator->sanitize($_POST);
+    $_POST = $container->get(Validator::class)->sanitize($_POST);
 
     $data = [
         'gibbonSchoolYearID'    => $session->get('gibbonSchoolYearID'),
