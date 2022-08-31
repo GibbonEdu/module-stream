@@ -16,9 +16,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+.columns-1 {
+    columns: 1;
+}
 
 @media (min-width:640px){
-    .sm\:h-80 {
-        height: 20rem;
+    .sm\:columns-2 {
+        columns: 2;
+    }
+}
+
+@media (min-width:1000px){
+    .lg\:columns-3 {
+        columns: 3;
+    }
+
+    .lg\:columns-4 {
+        columns: 4;
     }
 }

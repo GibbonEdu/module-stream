@@ -50,3 +50,8 @@ $sql[$count][1] = "
 $sql[$count][0] = '1.0.08';
 $sql[$count][1] = "
 ";
+
+//v1.0.09
+$sql[$count][0] = '1.0.09';
+$sql[$count][1] = "
+";

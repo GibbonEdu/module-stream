@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v1.0.09
+-------
+Changed the images in posts to a masonry-style layout
+
 v1.0.08
 -------
 Tweaked the aspect ratio of images so less of the image is cropped
