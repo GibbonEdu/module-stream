@@ -64,6 +64,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
         ->filterBy('category', $urlParams['streamCategoryID'])
         ->filterBy('tag', $urlParams['tag'])
         ->filterBy('user', $urlParams['user'])
+        ->pageSize(15)
         ->fromPOST();
 
     // Get the stream, join a set of attachment data per post

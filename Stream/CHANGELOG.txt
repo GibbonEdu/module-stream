@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v1.0.10
+-------
+Fixed number of posts loaded via the Load More pagination button
+
 v1.0.09
 -------
 Changed the images in posts to a masonry-style layout
