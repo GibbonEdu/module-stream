@@ -1,0 +1,7 @@
+Pleaase follow the following steps if you wish to add the mini Stream to the dashboard of your homepage
+
+1. Go to your Gibbon root folder and create a new file namedd "index_customSidebar.php"
+2. Copy & paste all the lines of code from index_customSidebar.php file inside the Stream Module to the newly created index_customSidebar.php in the Gibbon root folder.
+3. From the Gibbbon root folder -> Go to resources -> templates -> Create a new file named "sidebarStream.twig.html" -> Copy & paste all the lines of code from sidebarStream.twig.html file inside the Stream Module (Stream -> templates -> sidebarStream.twig.html)
+4. From the Gibbbon root folder -> Go to resources -> templates -> Create a new file named "sidebarStreamPosts.twig.html" -> Copy & paste all the lines of code from sidebarStreamPosts.twig.html file inside the Stream Module (Stream -> templates -> sidebarStreamPosts.twig.html)
+5. Go to Gibbon and login, the new Mini Stream will be visible on the sidebar of the dashboard on the homescreen. 
