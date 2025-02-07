@@ -137,10 +137,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/stream.php') == fal
         $form->addHiddenValue('address', $session->get('address'));
         $form->addHiddenValue('source', 'stream');
         $form->addHiddenValue('streamCategoryID', $urlParams['streamCategoryID']);
+        $form->addClass('form-small');
+        $form->removeMeta();
 
         $postLength = $container->get(SettingGateway::class)->getSettingByScope('Stream', 'postLength');
-        $col = $form->addRow()->addColumn();
-            $col->addTextArea('post')->setID('newPost')->required()->setRows(6)->addClass('font-sans text-sm')->maxLength($postLength);
+        $col = $form->addRow()->addColumn()->addClass('font-sans text-sm');
+            $col->addTextArea('post')->setID('newPost')->required()->setRows(6)->maxLength($postLength);
 
         $row = $form->addRow()->addDetails()->summary(__('Add Photos'));
             $row->addFileUpload('attachments')->accepts('.jpg,.jpeg,.gif,.png')->uploadMultiple(true);
