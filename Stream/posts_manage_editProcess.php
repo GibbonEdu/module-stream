@@ -24,6 +24,7 @@ use Gibbon\Module\Stream\Domain\PostGateway;
 use Gibbon\Module\Stream\Domain\PostTagGateway;
 use Gibbon\Module\Stream\Domain\PostAttachmentGateway;
 use Gibbon\Domain\System\SettingGateway;
+use Gibbon\Domain\System\FileGateway;
 use Gibbon\Data\Validator;
 
 require_once '../../gibbon.php';
@@ -95,6 +96,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_edit.p
             $attachment = $fileUploader->uploadAndResizeImage($file, 'streamPhoto', $maxImageSize, 90);
 
             if (!empty($attachment)) {
+                $fileMetaData = $fileUploader->getFileMetaData($attachment);
+                
                 $thumbPath = $absolutePath.'/'.str_replace('streamPhoto', 'streamThumb', $attachment);
                 $thumbnail = $fileUploader->resizeImage($absolutePath.'/'.$attachment, $thumbPath, 650);
 
@@ -105,7 +108,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_edit.p
                     'type'         => 'Image',
                 ];
 
-                $postAttachmentGateway->insert($data);
+                $streamPostAttachmentID = $postAttachmentGateway->insert($data);
+                
+                // Record file tracking
+                if (!empty($fileMetaData) && !empty($streamPostAttachmentID)) {
+                    $gibbonFileID = $container->get(FileGateway::class)->recordFileUpload($fileMetaData, 'streamPostAttachment', $streamPostAttachmentID, 'attachment');
+                    
+                    if (empty($gibbonFileID)) {
+                        $partialFail = true;
+                    }
+                }
             } else {
                 $partialFail = true;
             }
