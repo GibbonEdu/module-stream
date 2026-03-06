@@ -24,7 +24,7 @@ use Gibbon\Module\Stream\Domain\PostGateway;
 use Gibbon\Module\Stream\Domain\PostTagGateway;
 use Gibbon\Module\Stream\Domain\PostAttachmentGateway;
 use Gibbon\Domain\System\SettingGateway;
-use Gibbon\Domain\System\FileGateway;
+use Gibbon\Contracts\Filesystem\FileHandler;
 use Gibbon\Data\Validator;
 
 require_once '../../gibbon.php';
@@ -50,7 +50,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_edit.p
 
     $data = [
         'post' => $_POST['post'] ?? '',
-        'streamCategoryIDList'  => (!empty($_POST['streamCategoryIDList']) &&(is_array($_POST['streamCategoryIDList'])) ? implode(",", $_POST['streamCategoryIDList']) : null)
+        'streamCategoryIDList'  => (!empty($_POST['streamCategoryIDList']) && (is_array($_POST['streamCategoryIDList'])) ? implode(",", $_POST['streamCategoryIDList']) : null)
     ];
 
     // Validate the required values are present
@@ -112,7 +112,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_edit.p
                 
                 // Record file tracking
                 if (!empty($fileMetaData) && !empty($streamPostAttachmentID)) {
-                    $gibbonFileID = $container->get(FileGateway::class)->recordFileUpload($fileMetaData, 'streamPostAttachment', $streamPostAttachmentID, 'attachment');
+                    $gibbonFileID = $container->get(FileHandler::class)->recordFileUpload($fileMetaData, 'streamPostAttachment', $streamPostAttachmentID, 'attachment');
                     
                     if (empty($gibbonFileID)) {
                         $partialFail = true;

@@ -21,7 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use Gibbon\FileUploader;
 use Gibbon\Domain\System\SettingGateway;
-use Gibbon\Domain\System\FileGateway;
+use Gibbon\Contracts\Filesystem\FileHandler;
 use Gibbon\Module\Stream\Domain\PostGateway;
 use Gibbon\Module\Stream\Domain\PostTagGateway;
 use Gibbon\Module\Stream\Domain\PostAttachmentGateway;
@@ -117,7 +117,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.ph
                 
                 // Record file tracking
                 if (!empty($fileMetaData) && !empty($streamPostAttachmentID)) {
-                    $gibbonFileID = $container->get(FileGateway::class)->recordFileUpload($fileMetaData, 'streamPostAttachment', $streamPostAttachmentID, 'attachment');
+                    $gibbonFileID = $container->get(FileHandler::class)->recordFileUpload($fileMetaData, 'streamPostAttachment', $streamPostAttachmentID, 'attachment');
                     
                     if (empty($gibbonFileID)) {
                         $partialFail = true;
