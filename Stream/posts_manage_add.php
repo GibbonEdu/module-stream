@@ -39,6 +39,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.ph
     }
     $page->return->setEditLink($editLink);
 
+    $page->return->addReturns([
+        'error11' => __m('Your post could not be submitted because the uploaded images exceed the server\'s size limit. Please upload fewer images at a time or try again.'),
+        'error12' => __m('Your post could not be submitted because one or more uploaded files are not a valid image type. Accepted formats: JPG, GIF, PNG.'),
+    ]);
+
     $form = Form::create('post', $session->get('absoluteURL').'/modules/'.$session->get('module').'/posts_manage_addProcess.php');
     $form->setFactory(DatabaseFormFactory::create($pdo));
 

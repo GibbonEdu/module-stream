@@ -2,6 +2,10 @@ CHANGELOG
 =========
 v1.2.00
 -------
+Added error message to detect if uploaded images exceed server's limit
+
+v1.2.00
+-------
 Gibbon v28 compatibility
 
 v1.1.02
