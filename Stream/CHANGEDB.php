@@ -88,7 +88,7 @@ $sql[$count][1] = "";
 $sql[$count][0] = '1.2.00';
 $sql[$count][1] = "";
 
-//v1.2.02
+//v1.2.01
 ++$count;
-$sql[$count][0] = '1.2.02';
+$sql[$count][0] = '1.2.01';
 $sql[$count][1] = "";

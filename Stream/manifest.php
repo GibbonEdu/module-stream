@@ -27,7 +27,7 @@ $description = 'Stream is a photo sharing and social module, which allows users 
 $entryURL = 'stream.php';
 $type = 'Additional';
 $category = 'Other';
-$version = '1.2.02';
+$version = '1.2.01';
 $author = "Gibbon Foundation";
 $url = "https://gibbonedu.org";
 

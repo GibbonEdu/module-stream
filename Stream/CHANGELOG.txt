@@ -1,6 +1,6 @@
 CHANGELOG
 =========
-v1.2.00
+v1.2.01
 -------
 Added error message to detect if uploaded images exceed server's limit
 
