@@ -20,7 +20,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\FileUploader;
-use Gibbon\Services\Format;
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\Stream\Domain\PostGateway;
 use Gibbon\Module\Stream\Domain\PostTagGateway;
@@ -51,6 +50,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.ph
     $categoryGateway = $container->get(CategoryGateway::class);
 
     $partialFail = false;
+
+    // Detect if PHP silently dropped all POST/FILE data because the combined upload size exceeded the server's post_max_size limit.
+    $contentLength = intval($_SERVER['CONTENT_LENGTH'] ?? 0);
+    if ($contentLength > 0 && !isset($_POST['post'])) {
+        $URL .= '&return=error11';
+        header("Location: {$URL}");
+        exit;
+    }
 
     // Sanitize the whole $_POST array
     $_POST = $container->get(Validator::class)->sanitize($_POST);
@@ -98,6 +105,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.ph
 
         foreach ($_FILES['attachments']['name'] as $index => $name) {
             $file = array_combine(array_keys($_FILES['attachments']), array_column($_FILES['attachments'], $index));
+
+            // Reject non-image MIME types before attempting upload
+            $allowedMimes = ['image/jpeg', 'image/jpg', 'image/gif', 'image/png'];
+            if (!empty($file['type']) && !in_array(strtolower($file['type']), $allowedMimes)) {
+                $URL .= '&return=error12';
+                header("Location: {$URL}");
+                exit;
+            }
+
             $attachment = $fileUploader->uploadAndResizeImage($file, 'streamPhoto', $maxImageSize, 90);
 
             if (!empty($attachment)) {
