@@ -20,8 +20,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\FileUploader;
-use Gibbon\Services\Format;
 use Gibbon\Domain\System\SettingGateway;
+use Gibbon\Contracts\Filesystem\FileHandler;
 use Gibbon\Module\Stream\Domain\PostGateway;
 use Gibbon\Module\Stream\Domain\PostTagGateway;
 use Gibbon\Module\Stream\Domain\PostAttachmentGateway;
@@ -101,6 +101,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.ph
             $attachment = $fileUploader->uploadAndResizeImage($file, 'streamPhoto', $maxImageSize, 90);
 
             if (!empty($attachment)) {
+                $fileMetaData = $fileUploader->getFileMetaData($attachment);
+                
                 $thumbPath = $absolutePath.'/'.str_replace('streamPhoto', 'streamThumb', $attachment);
                 $thumbnail = $fileUploader->resizeImage($absolutePath.'/'.$attachment, $thumbPath, 650);
 
@@ -111,7 +113,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_add.ph
                     'type'         => 'Image',
                 ];
 
-                $postAttachmentGateway->insert($data);
+                $streamPostAttachmentID = $postAttachmentGateway->insert($data);
+                
+                // Record file tracking
+                if (!empty($fileMetaData) && !empty($streamPostAttachmentID)) {
+                    $gibbonFileID = $container->get(FileHandler::class)->recordFileUpload($fileMetaData, 'streamPostAttachment', $streamPostAttachmentID, 'attachment');
+                    
+                    if (empty($gibbonFileID)) {
+                        $partialFail = true;
+                    }
+                }
             } else {
                 $partialFail = true;
             }
