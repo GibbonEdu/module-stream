@@ -19,8 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-use Gibbon\FileUploader;
-use Gibbon\Domain\System\SettingGateway;
+use Gibbon\Contracts\Filesystem\FileHandler;
 use Gibbon\Module\Stream\Domain\PostAttachmentGateway;
 
 $_POST['address'] = '/modules/Stream/posts_manage_edit.php';
@@ -39,7 +38,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_edit.p
     // Proceed!
     $postAttachmentGateway = $container->get(PostAttachmentGateway::class);
     $absolutePath = $session->get('absolutePath');
-    $partialFail = false;
   
     // Validate the required values are present
     if (empty($streamPostID) || empty($streamPostAttachmentID)) {
@@ -56,19 +54,18 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_edit.p
         exit;
     }
 
-    // Delete the image files
-    if (!empty($attachment['attachment'])) {
-        $partialFail &= !unlink($absolutePath.'/'.$attachment['attachment']);
-    }
+    // Delete the tracked attachment file via FileHandler
+    $deleted = $container->get(FileHandler::class)->deleteFile('streamPostAttachment', $streamPostAttachmentID, 'attachment');
 
+    // Delete the thumbnail file directly (not tracked via FileHandler)
     if (!empty($attachment['thumbnail'])) {
-        $partialFail &= !unlink($absolutePath.'/'.$attachment['thumbnail']);
+        @unlink($absolutePath.'/'.$attachment['thumbnail']);
     }
 
     // Delete the record
     $deleted = $postAttachmentGateway->delete($streamPostAttachmentID);
 
-    $URL .= $partialFail || !$deleted
+    $URL .= !$deleted
         ? "&return=warning1"
         : "&return=success0";
 

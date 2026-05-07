@@ -19,7 +19,9 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Contracts\Filesystem\FileHandler;
 use Gibbon\Module\Stream\Domain\PostGateway;
+use Gibbon\Module\Stream\Domain\PostAttachmentGateway;
 
 require_once '../../gibbon.php';
 
@@ -38,6 +40,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_delete
 } else {
     // Proceed!
     $postGateway = $container->get(PostGateway::class);
+    $postAttachmentGateway = $container->get(PostAttachmentGateway::class);
+    $absolutePath = $session->get('absolutePath');
     $values = $postGateway->getByID($streamPostID);
 
     if (empty($values)) {
@@ -45,6 +49,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/posts_manage_delete
         header("Location: {$URL}");
         exit;
     }
+
+    $attachments = $postAttachmentGateway->selectBy(['streamPostID' => $streamPostID], ['streamPostAttachmentID', 'thumbnail'])->fetchAll();
+    
+    foreach ($attachments as $attachment) {
+        $fileDeleted = $container->get(FileHandler::class)->deleteFile('streamPostAttachment', $attachment['streamPostAttachmentID'], 'attachment');
+        if (!empty($attachment['thumbnail'])) {
+            @unlink($absolutePath.'/'.$attachment['thumbnail']);
+        }
+    }
+
+    $deleted = $postAttachmentGateway->deleteWhere(['streamPostID' => $streamPostID]);
 
     $deleted = $postGateway->delete($streamPostID);
 
