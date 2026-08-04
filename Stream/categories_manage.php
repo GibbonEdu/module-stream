@@ -20,7 +20,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\Tables\DataTable;
-use Gibbon\Services\Format;
 use Gibbon\Module\Stream\Domain\CategoryGateway;
 
 if (isActionAccessible($guid, $connection2, '/modules/Stream/categories_manage.php') == false) {
@@ -32,7 +31,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Stream/categories_manage.p
         ->add(__m('Manage Categories'));
 
     // Query categories
-    $categoryGateway = $container->get(categoryGateway::class);
+    $categoryGateway = $container->get(CategoryGateway::class);
 
     $criteria = $categoryGateway->newQueryCriteria()
         ->sortBy(['sequenceNumber', 'name'])

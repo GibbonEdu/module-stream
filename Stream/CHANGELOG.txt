@@ -1,5 +1,8 @@
 CHANGELOG
 =========
+v1.2.01
+Fixed syntax error and removed unused imported classes
+
 v1.2.00
 -------
 Gibbon v28 compatibility
