@@ -20,7 +20,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\FileUploader;
-use Gibbon\Services\Format;
 use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\Stream\Domain\PostGateway;
 use Gibbon\Module\Stream\Domain\PostTagGateway;
